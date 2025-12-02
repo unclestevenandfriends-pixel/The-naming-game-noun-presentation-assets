@@ -1,0 +1,3715 @@
+<html lang="en" class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Naming Game: KS2 Masterclass</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=Inter+Tight:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Fredoka:wght@300;400;500;600;700&amp;family=Annie+Use+Your+Telescope&amp;display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#0B0C15',
+            primary: '#22d3ee',
+            secondary: '#94a3b8',
+            accent: '#f472b6',
+            // Mapping 'brand' to 'primary' to fix existing references if any remain
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#22d3ee', // Primary Cyan
+              500: '#22d3ee', // Primary Cyan
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+              950: '#042f2e',
+            },
+          },
+          fontFamily: {
+            display: ['"Fredoka"', 'sans-serif'],
+            body: ['"Comic Sans MS"', '"Comic Sans"', '"Chalkboard SE"', 'sans-serif'],
+            accent: ['"Nunito"', 'sans-serif'],
+            flair: ['"Poppins"', 'sans-serif'],
+            mono: ['"Annie Use Your Telescope"', 'cursive'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Global box-sizing */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    /* 
+       STABILIZED DESKTOP-FIRST CSS 
+       - Removed aggressive 'vh' scaling to prevent top-cutoff.
+       - Removed complex mobile/tablet overrides.
+       - Prioritizing 1920x1080 and larger displays.
+    */
+
+    /* --- CORE SCALING ENGINE --- */
+    html {
+      font-size: 16px;
+    }
+
+    @media (min-width: 1024px) {
+      html {
+        font-size: 2vh;
+      }
+    }
+
+    body {
+      background-color: #0B0C15;
+      color: #E2E8F0;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 16:9 VIEWPORT FRAME */
+    #viewport-frame {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 177.78vh;
+      /* Force 16:9 */
+      max-height: 56.25vw;
+      background: #0B0C15;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- VISUALS --- */
+    .bg-grid {
+      position: absolute;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      background-size: 4rem 4rem;
+      background-image: linear-gradient(to right, rgba(34, 211, 238, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+      mask-image: radial-gradient(circle at center, black 40%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* --- ANIMATIONS & EFFECTS --- */
+    h1,
+    h2,
+    .font-display {
+      letter-spacing: -0.03em;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    h3 {
+      letter-spacing: -0.03em;
+      text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.1), 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    p,
+    li,
+    .font-body,
+    .font-mono,
+    .interactive-word {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+
+    .font-bold {
+      font-weight: 600 !important;
+    }
+
+    /* Slide Container */
+    .slides-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      height: 100vh;
+      width: 100vw;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+
+    .slides-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Individual Slide */
+    .slide {
+      flex: 0 0 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* Vertically center */
+      align-items: center;
+      /* Horizontally center */
+    }
+
+    /* Slide Content Wrapper */
+    .slide-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      /* Restrict width to ensure it doesn't span too wide on ultrawide monitors */
+      max-width: 1600px;
+      padding: 8rem 4rem 4rem 4rem;
+      /* Increased top padding for Nav Bar */
+      margin: 0 auto;
+      height: 100%;
+      /* Ensure it takes full height for vertical centering */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Ensure images fit within the slide and don't push content out */
+    .slide-content img {
+      max-width: 100%;
+      height: auto;
+      max-height: 60vh;
+      /* Cap image height to prevent overflow */
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Glass Panel Styling (Aura Aesthetic) */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .glass-panel:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      transform: translateY(-4px) scale(1.005);
+    }
+
+    /* Background grid pattern */
+    .bg-grid-pattern {
+      background-image: var(--tw-bg-grid-pattern);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Gradient text utilities */
+    .text-gradient {
+      background: linear-gradient(to bottom, #ffffff 40%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .text-gradient-brand {
+      background: linear-gradient(to right, #2DD4BF, #60A5FA);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Blob animation */
+    .blob {
+      position: absolute;
+      filter: blur(100px);
+      opacity: 0.35;
+      z-index: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      animation: float 20s infinite ease-in-out alternate;
+    }
+
+    /* --- ANIMATIONS & EFFECTS --- */
+    #mouse-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 45rem;
+      height: 45rem;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(34, 211, 238, 0.4) 20%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      opacity: 1.0;
+      transition: opacity 0.3s;
+      filter: blur(20px);
+    }
+
+    .anim-entry {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .slide.active .anim-entry {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Stagger delays for children */
+    .slide.active .anim-entry:nth-child(1) {
+      transition-delay: 0.1s;
+    }
+
+    .slide.active .anim-entry:nth-child(2) {
+      transition-delay: 0.2s;
+    }
+
+    .slide.active .anim-entry:nth-child(3) {
+      transition-delay: 0.3s;
+    }
+
+    .slide.active .anim-entry:nth-child(4) {
+      transition-delay: 0.4s;
+    }
+
+    .slide.active .anim-entry:nth-child(5) {
+      transition-delay: 0.5s;
+    }
+
+    .slide.active .anim-entry:nth-child(6) {
+      transition-delay: 0.6s;
+    }
+
+    /* Hover Pop Effect */
+    .hover-pop {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .hover-pop:hover {
+      transform: scale(1.05) translateY(-5px);
+    }
+
+    /* Glass Panel Enhancements */
+    .glass-panel {
+      transition: all 0.4s ease;
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 10px 40px -10px rgba(34, 211, 238, 0.3);
+      transform: translateY(-2px);
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+
+      33% {
+        transform: translate(30px, -40px) rotate(10deg) scale(1.1);
+      }
+
+      66% {
+        transform: translate(-30px, 30px) rotate(-5deg) scale(0.95);
+      }
+
+      100% {
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+    }
+
+    /* Performance optimizations */
+    .slide {
+      contain: layout style paint;
+    }
+
+    .glass-panel,
+    .interactive-word,
+    .blob {
+      will-change: transform;
+    }
+
+    /* Font Utilities */
+    .font-geist {
+      font-family: 'Geist', sans-serif !important;
+    }
+
+    .font-roboto {
+      font-family: 'Roboto', sans-serif !important;
+    }
+
+    .font-montserrat {
+      font-family: 'Montserrat', sans-serif !important;
+    }
+
+    .font-poppins {
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    .font-playfair {
+      font-family: 'Playfair Display', serif !important;
+    }
+
+    .font-instrument-serif {
+      font-family: 'Instrument Serif', serif !important;
+    }
+
+    .font-merriweather {
+      font-family: 'Merriweather', serif !important;
+    }
+
+    .font-bricolage {
+      font-family: 'Bricolage Grotesque', sans-serif !important;
+    }
+
+    .font-jakarta {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
+    .font-manrope {
+      font-family: 'Manrope', sans-serif !important;
+    }
+
+    .font-space-grotesk {
+      font-family: 'Space Grotesk', sans-serif !important;
+    }
+
+    .font-work-sans {
+      font-family: 'Work Sans', sans-serif !important;
+    }
+
+    .font-pt-serif {
+      font-family: 'PT Serif', serif !important;
+    }
+
+    .font-geist-mono {
+      font-family: 'Geist Mono', monospace !important;
+    }
+
+    .font-space-mono {
+      font-family: 'Space Mono', monospace !important;
+    }
+
+    .font-quicksand {
+      font-family: 'Quicksand', sans-serif !important;
+    }
+
+    .font-nunito {
+      font-family: 'Nunito', sans-serif !important;
+    }
+
+    /* --- Draft 3 Aesthetic Components (Restored) --- */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transform: translateZ(0);
+      /* Hardware accel */
+      max-height: 90%;
+      overflow-y: auto;
+    }
+
+    .glass-card::-webkit-scrollbar {
+      display: none;
+    }
+
+    .text-glow {
+      text-shadow: 0 0 2rem rgba(34, 211, 238, 0.4);
+    }
+
+    .float-anim {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .question-box {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .question-box:hover {
+      transform: translateX(5px);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .turn-and-talk-box {
+      background: linear-gradient(to right, rgba(34, 211, 238, 0.1), transparent);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+  </style>
+  <link id="all-fonts-link-font-geist" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-roboto" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-montserrat" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-poppins" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-playfair" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&amp;display=swap">
+  <link id="all-fonts-link-font-instrument-serif" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:wght@400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-merriweather" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&amp;display=swap">
+  <link id="all-fonts-link-font-bricolage" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-jakarta" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap">
+  <link id="all-fonts-link-font-manrope" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap">
+  <link id="all-fonts-link-font-space-grotesk" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-work-sans" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&amp;display=swap">
+  <link id="all-fonts-link-font-pt-serif" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&amp;display=swap">
+  <link id="all-fonts-link-font-geist-mono" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-space-mono" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;display=swap">
+  <link id="all-fonts-link-font-quicksand" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap">
+  <link id="all-fonts-link-font-nunito" rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&amp;display=swap">
+</head>
+
+<body class="">
+  <!-- Global Background -->
+  <div class="fixed inset-0 z-0 bg-[#0B0C15] pointer-events-none"></div>
+
+  <!-- Draft 3 Grid Pattern -->
+  <div
+    class="fixed inset-0 z-0 bg-[linear-gradient(to_right,rgba(34,211,238,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(34,211,238,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(circle_at_center,black_40%,transparent_70%)] pointer-events-none">
+  </div>
+
+  <!-- Outer Spotlight Removed -->
+
+  <!-- Ambient Blobs Removed to match Draft 3 -->
+
+  <!-- Navigation/Progress -->
+  <nav
+    class="fixed flex transition-all duration-300 w-full z-50 border-b pt-6 pr-8 pb-6 pl-8 top-0 left-0 shadow-sm backdrop-blur-lg items-center justify-between bg-black/5 border-white/5 opacity-0 transition-opacity duration-1000">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full animate-pulse bg-brand-400"></div>
+      <span class="font-mono text-xs uppercase tracking-widest text-indigo-400">
+        EMSUSF1/1
+      </span>
+    </div>
+    <div class="font-mono text-xs text-indigo-500" id="slide-counter">
+      01 / 30
+    </div>
+  </nav>
+
+  <!-- LOBBY SCREEN -->
+  <section id="lobby-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0B0C15]">
+    <div
+      class="absolute inset-0 bg-[linear-gradient(to_right,rgba(34,211,238,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(34,211,238,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(circle_at_center,black_40%,transparent_70%)] pointer-events-none">
+    </div>
+
+    <div
+      class="glass-panel p-12 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(34,211,238,0.2)] max-w-2xl w-full relative z-10 text-center">
+      <h1 class="font-display text-6xl font-bold text-white mb-2 tracking-tighter text-glow">Welcome</h1>
+      <p class="text-xl text-indigo-300 font-light mb-10">Please enter your details to begin the class.</p>
+
+      <div class="space-y-6 text-left">
+        <div>
+          <label class="block text-brand-400 font-mono text-sm uppercase tracking-widest mb-2 font-bold">Student
+            Name</label>
+          <input type="text" id="student-name" placeholder="Enter your name..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white text-xl focus:outline-none focus:border-brand-500 focus:bg-white/10 transition-all placeholder:text-white/20">
+        </div>
+
+        <div>
+          <label class="block text-brand-400 font-mono text-sm uppercase tracking-widest mb-2 font-bold">Class
+            Date</label>
+          <input type="date" id="class-date"
+            class="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white text-xl focus:outline-none focus:border-brand-500 focus:bg-white/10 transition-all [color-scheme:dark]">
+        </div>
+
+        <button onclick="startClass()"
+          class="w-full bg-gradient-to-r from-brand-500 to-brand-400 text-black font-bold text-xl py-5 rounded-xl hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] transition-all duration-300 mt-4 uppercase tracking-widest">
+          Start Class
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div id="viewport-frame" class="opacity-0 transition-opacity duration-1000">
+
+    <!-- INVISIBLE TEACHER TRIGGER (Bottom Right) -->
+    <div id="teacher-trigger" onclick="document.getElementById('teacher-modal').showModal()"
+      class="fixed bottom-0 right-0 w-[50px] h-[50px] z-[9999] opacity-0 cursor-pointer" title="Teacher Tools"></div>
+
+    <!-- TEACHER MODAL (Hidden) -->
+    <dialog id="teacher-modal"
+      class="bg-transparent backdrop:bg-black/80 backdrop:backdrop-blur-sm p-0 rounded-[2rem] shadow-2xl open:animate-fade-in">
+      <div class="glass-panel p-10 rounded-[2rem] border border-brand-500/30 max-w-lg w-full bg-[#0B0C15]">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-bold text-white font-display">Teacher Tools</h2>
+          <button onclick="document.getElementById('teacher-modal').close()"
+            class="text-indigo-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-brand-400 font-mono text-sm uppercase tracking-widest mb-2 font-bold">Note for
+            Parent/Student</label>
+          <textarea id="teacher-note-input" rows="4" placeholder="Write a summary or feedback here..."
+            class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-lg focus:outline-none focus:border-brand-500 focus:bg-white/10 transition-all placeholder:text-white/20 resize-none"></textarea>
+        </div>
+
+        <button onclick="generateMagicLink()"
+          class="w-full bg-gradient-to-r from-purple-500 to-brand-500 text-white font-bold text-lg py-4 rounded-xl hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-300 uppercase tracking-widest flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          Generate Magic Link
+        </button>
+        <p id="copy-feedback" class="text-green-400 text-center mt-3 text-sm font-bold opacity-0 transition-opacity">
+          Link Copied to Clipboard!</p>
+
+        <!-- HOMEWORK GENERATOR (Security Update) -->
+        <div class="mt-8 pt-8 border-t border-white/10">
+          <h3 class="text-white font-bold mb-4 font-display text-xl">Homework Generator</h3>
+          <div class="flex gap-4">
+            <input type="date" id="homework-expiry"
+              class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-500/50 w-full"
+              placeholder="Leave empty for 10 days">
+            <button onclick="generateHomeworkLink()"
+              class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-bold transition-all whitespace-nowrap border border-white/10">Generate
+              Link</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="bg-grid"></div>
+
+    <!-- MUSIC CONTROLS (Jukebox v7.1) -->
+    <div id="music-controls"
+      class="fixed top-6 right-6 z-[90] flex items-center gap-3 bg-black/40 backdrop-blur-md p-2 rounded-full border border-white/10 transition-all hover:bg-black/60">
+      <button id="music-toggle" onclick="toggleMusic()"
+        class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all">
+        <span id="music-icon">🎵</span>
+      </button>
+      <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5"
+        class="w-24 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-brand-500"
+        oninput="setMusicVolume(this.value)">
+    </div>
+
+    <!-- Spotlight Effect (Draft 3 Exact) -->
+    <div id="mouse-glow"
+      style="position: absolute; width: 40rem; height: 40rem; background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%); transform: translate(-50%, -50%); pointer-events: none; z-index: 1; mix-blend-mode: screen; opacity: 0.6;">
+    </div>
+
+    <!-- Main Scroll Container -->
+    <main
+      class="slides-container relative z-20 w-full h-full flex flex-row overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth"
+      id="slider">
+      <!-- Slide 1: Title -->
+      <!-- Slide 0: CERTIFICATE / REPORT (Hidden by default) -->
+      <section class="slide hidden" id="slide-zero">
+        <div class="slide-content flex flex-col items-center justify-center h-full max-w-5xl">
+
+          <!-- Interaction Overlay (Fix for Autoplay) -->
+          <div id="report-overlay"
+            class="absolute inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-8 backdrop-blur-xl transition-opacity duration-500">
+            <div
+              class="border-4 border-red-500/50 p-12 rounded-[2rem] text-center transform -rotate-2 shadow-[0_0_100px_rgba(239,68,68,0.2)] bg-black/50">
+              <h2 class="text-6xl font-black text-red-500 tracking-widest mb-4 uppercase"
+                style="font-family: 'Black Ops One', system-ui;">Top Secret</h2>
+              <p class="text-red-400/80 font-mono text-xl mb-8 tracking-widest uppercase">Classified Mission Report</p>
+              <button onclick="SoundFX.init(); SoundFX.unlock(); initJukebox(); revealReport()"
+                class="bg-red-600 hover:bg-red-500 text-white text-2xl font-bold py-4 px-12 rounded-xl shadow-lg hover:scale-105 transition-all duration-300 uppercase tracking-widest">
+                Open Report
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="glass-panel p-12 rounded-[3rem] border-2 border-brand-500/30 shadow-[0_0_100px_rgba(34,211,238,0.15)] w-full text-center relative overflow-y-auto flex flex-col max-h-[90vh]">
+            <!-- Background Decoration -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-500 via-purple-500 to-brand-500">
+            </div>
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"></div>
+
+            <!-- Header -->
+            <div class="flex items-center justify-center gap-4 mb-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-award text-yellow-400 drop-shadow-lg">
+                <circle cx="12" cy="8" r="7" />
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+              </svg>
+              <h1 class="font-display text-5xl lg:text-7xl font-bold text-white tracking-tighter text-glow">Mission
+                Report</h1>
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-award text-yellow-400 drop-shadow-lg">
+                <circle cx="12" cy="8" r="7" />
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+              </svg>
+            </div>
+
+            <!-- Student Details -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+              <div class="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <span class="block text-indigo-400 font-mono text-sm uppercase tracking-widest mb-2">Student
+                  Agent</span>
+                <span id="report-name" class="block text-3xl font-bold text-white">Unknown</span>
+              </div>
+              <div class="bg-white/5 rounded-2xl p-6 border border-white/10">
+                <span class="block text-indigo-400 font-mono text-sm uppercase tracking-widest mb-2">Mission Date</span>
+                <span id="report-date" class="block text-3xl font-bold text-white">Unknown</span>
+              </div>
+            </div>
+
+            <!-- Score Badge -->
+            <div class="mb-10">
+              <div
+                class="inline-flex flex-col items-center justify-center w-48 h-48 rounded-full border-4 border-brand-500/50 bg-brand-500/10 shadow-[0_0_50px_rgba(34,211,238,0.2)] relative">
+                <span class="text-indigo-300 font-mono text-sm uppercase tracking-widest absolute top-8">Score</span>
+                <span id="report-score" class="text-6xl font-bold text-white">0/0</span>
+                <div id="report-badge-icon"
+                  class="absolute -bottom-4 bg-black border border-brand-500 px-4 py-1 rounded-full text-brand-400 font-bold uppercase text-sm">
+                  Rank: Cadet
+                </div>
+              </div>
+            </div>
+
+            <!-- Teacher Note (Expanded & Scrollable) -->
+            <div id="teacher-note-display-container"
+              class="hidden flex-grow bg-black/40 backdrop-blur-md p-6 rounded-2xl border border-brand-500/50 relative overflow-y-auto flex flex-col min-h-[40vh] max-h-[50vh]">
+              <div
+                class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent">
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-quote text-indigo-500 absolute top-4 left-4 opacity-30">
+                <path
+                  d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+                <path
+                  d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+              </svg>
+
+              <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
+                <p id="teacher-note-text"
+                  class="text-xl lg:text-2xl text-indigo-100 font-medium italic pl-8 leading-relaxed whitespace-pre-wrap">
+                  "Great job today!"
+                </p>
+              </div>
+
+              <div class="mt-4 text-right shrink-0">
+                <span class="text-xs font-mono text-indigo-400 uppercase tracking-widest">- Teacher's Note</span>
+              </div>
+            </div>
+
+            <p class="mt-8 text-indigo-400/50 text-sm font-mono">
+              Scroll down to review mission evidence.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 1: Title -->
+      <!-- 0. HERO -->
+      <section class="slide active" id="slide-0">
+        <div class="w-full h-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div class="pl-8 lg:pl-24 z-20 text-center lg:text-left flex flex-col justify-center h-full">
+            <div class="flex items-center justify-center lg:justify-start gap-3 mb-8 anim-entry">
+              <span class="w-3 h-3 rounded-full bg-primary animate-pulse shadow-[0_0_1rem_#22d3ee]"></span>
+              <span class="font-accent text-sm font-bold tracking-widest uppercase text-secondary">KS2
+                Presentation</span>
+            </div>
+            <h1
+              class="font-display text-7xl lg:text-9xl font-bold tracking-tighter leading-[0.85] text-white mb-8 text-glow anim-entry">
+              The<br>Naming<br>Game</h1>
+            <h2
+              class="font-display text-3xl lg:text-4xl text-primary font-medium tracking-wide border-l-0 lg:border-l-4 border-primary lg:pl-8 anim-entry">
+              Common and Proper Nouns</h2>
+          </div>
+          <div
+            class="relative w-full h-[40vh] lg:h-full flex items-center justify-center float-anim anim-entry lg:pr-32">
+            <div
+              class="absolute inset-0 bg-yellow-500/20 blur-[8rem] rounded-full pointer-events-none mix-blend-screen">
+            </div>
+            <div
+              class="glass-card w-[90%] lg:w-[30rem] h-[80%] rounded-[2rem] flex flex-col items-center justify-center relative z-10 overflow-hidden border-white/20 p-3">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-hero-page.jpeg"
+                class="w-full h-full object-cover rounded-[1.5rem]">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 2: A World Without Names -->
+      <!-- Slide 2: A World Without Names -->
+      <!-- Slide 2: A World Without Names -->
+      <!-- 1. WORLD WITHOUT NAMES -->
+      <section class="slide" id="slide-1">
+        <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="order-1 lg:order-1 flex justify-center anim-entry">
+            <div
+              class="glass-card w-[30rem] h-[30rem] rounded-[2rem] p-3 border-white/20 overflow-hidden relative flex flex-col items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/pointing-finger.jpeg"
+                class="w-full h-full object-cover rounded-[1.5rem]">
+            </div>
+          </div>
+          <div class="order-2 lg:order-2 text-center lg:text-left">
+            <h2 class="font-display text-4xl lg:text-6xl font-bold text-white mb-6 tracking-tight anim-entry">A World
+              Without <span class="text-primary">Names?</span></h2>
+            <p class="font-body text-xl text-secondary mb-2 font-medium anim-entry">Let's imagine something together.
+            </p>
+            <p class="font-body text-2xl text-white mb-8 anim-entry">If you woke up tomorrow and nothing had a name...
+            </p>
+            <div class="space-y-4 anim-entry">
+              <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-primary font-bold font-flair text-lg">
+                  ?</div>
+                <p class="font-body text-lg text-white">How would you ask for an <strong
+                    class="text-primary">orange</strong> for breakfast?</p>
+              </div>
+              <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-primary font-bold font-flair text-lg">
+                  ?</div>
+                <p class="font-body text-lg text-white">How would you call your <strong
+                    class="text-primary">mate</strong> to play?</p>
+              </div>
+            </div>
+            <p class="font-body text-xl text-white font-bold mt-8 border-l-4 border-primary pl-4 anim-entry">You would
+              just have to point and make noises!</p>
+            <div
+              class="mt-8 p-6 rounded-2xl border border-white/10 bg-gradient-to-r from-primary/10 to-transparent anim-entry">
+              <h3 class="font-display text-xl font-bold text-white mb-2 flex items-center gap-3"><i
+                  class="fa-solid fa-comments text-primary"></i> Turn and Talk</h3>
+              <p class="font-body text-secondary text-lg">What is the hardest thing to ask for if you can't use names?
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 3: Meet Norah Noun -->
+      <!-- Slide 3: Meet Norah Noun -->
+      <!-- Slide 3: Meet Norah Noun -->
+      <!-- Slide 3: Meet Norah Noun -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl h-full">
+          <div class="relative flex justify-center items-center h-full">
+            <div class="absolute inset-0 bg-brand-500 blur-[100px] opacity-40 rounded-full animate-pulse"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-[0_0_60px_rgba(34,211,238,0.4)]">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/meet-norah-noun.jpeg"
+                class="w-full max-w-[30rem] aspect-square rounded-[2.5rem] object-cover" alt="Norah Noun Waving">
+            </div>
+          </div>
+
+          <div class="flex flex-col justify-center">
+            <h2
+              class="text-6xl md:text-8xl font-display font-bold mb-10 text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] leading-tight">
+              Meet<br>Norah Noun!
+            </h2>
+
+            <div
+              class="glass-panel p-10 rounded-[2.5rem] relative overflow-hidden border-l-8 border-brand-500 shadow-2xl">
+              <div
+                class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-brand-500/5 to-transparent pointer-events-none">
+              </div>
+              <p class="text-2xl md:text-3xl font-light italic leading-relaxed text-white">
+                "Hi, my name is Norah Noun! My job is super important: I make sure
+                that people, places, animals, things, and ideas have a name. In
+                grammar, these labels are called Nouns."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 4: What is a Noun? -->
+      <!-- Slide 4: What is a Noun? -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-1 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-naming-things.jpeg"
+                class="w-full max-w-[30rem] aspect-square object-cover rounded-[2.5rem]"
+                style="clip-path: inset(0 round 2.5rem);">
+            </div>
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <h2 class="text-6xl font-display font-bold mb-8 text-white tracking-tight">
+              What is a Noun?
+            </h2>
+            <p class="text-3xl font-medium text-brand-400 mb-10">
+              A Noun is a Naming Word. It names a person, a place, or a thing.
+            </p>
+
+            <div class="space-y-4 mb-10">
+              <div class="glass-panel p-4 rounded-2xl flex items-center gap-6 hover:bg-white/5 transition-colors">
+                <span
+                  class="w-12 h-12 rounded-xl bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold text-2xl border border-brand-500/30">1</span>
+                <span class="text-3xl font-bold text-white">👤 Person</span>
+              </div>
+              <div class="glass-panel p-4 rounded-2xl flex items-center gap-6 hover:bg-white/5 transition-colors">
+                <span
+                  class="w-12 h-12 rounded-xl bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold text-2xl border border-brand-500/30">2</span>
+                <span class="text-3xl font-bold text-white">📍 Place</span>
+              </div>
+              <div class="glass-panel p-4 rounded-2xl flex items-center gap-6 hover:bg-white/5 transition-colors">
+                <span
+                  class="w-12 h-12 rounded-xl bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold text-2xl border border-brand-500/30">3</span>
+                <span class="text-3xl font-bold text-white">🎁 Thing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 5: Nouns Name People -->
+      <!-- Slide 5: Nouns Name People -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-2 lg:order-1" style="margin-top: -3rem;">
+            <div class="flex items-center gap-3 mb-8">
+              <div class="p-2 bg-brand-500/10 rounded-lg border border-brand-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  data-lucide="users" class="lucide lucide-users w-6 h-6 text-brand-400">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <circle cx="16" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <span class="text-sm font-mono uppercase tracking-widest text-brand-400">
+                Category 01
+              </span>
+            </div>
+            <h2 class="text-5xl md:text-6xl font-display font-bold mb-6 text-white">
+              Nouns Name People
+            </h2>
+            <p class="text-xl mb-10 text-indigo-300 font-light">
+              Nouns can be used to label people.
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <span class="glass-panel px-6 py-3 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono">nurse</span>
+              </span>
+              <span class="glass-panel px-6 py-3 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono">chef</span>
+              </span>
+              <span class="glass-panel px-6 py-3 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono">girl</span>
+              </span>
+              <span class="glass-panel px-6 py-3 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono">boy</span>
+              </span>
+            </div>
+            <p class="text-xl text-indigo-200 leading-relaxed border-l-4 border-white/20 pl-6 mt-10">
+              Look around your room right now: everything you can see or touch is a noun.
+              <strong class="text-white block mt-2">If you can take a picture of it with a camera, it is a
+                Noun.</strong>
+            </p>
+          </div>
+
+          <div class="order-1 lg:order-2 relative group" style="margin-top: -3rem;">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-card p-3 border-white/20 rounded-[2rem] rotate-2 transition-transform duration-500 group-hover:rotate-0">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/people-nouns.jpeg"
+                class="w-full h-auto object-cover rounded-[2rem]" alt="People Nouns">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 6: Nouns Name Places -->
+
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-2 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-blue-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-2 rounded-[2rem] -rotate-1 transition-transform duration-500 group-hover:rotate-0">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/place-nouns.jpeg"
+                class="w-full h-[28rem] object-cover rounded-[1.5rem] opacity-100" alt="Place Nouns">
+            </div>
+          </div>
+
+          <div class="order-1 lg:order-2">
+            <div class="flex items-center gap-3 mb-8">
+              <div class="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  data-lucide="map" class="lucide lucide-map w-6 h-6 text-blue-400">
+                  <path
+                    d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z">
+                  </path>
+                  <path d="M15 5.764v15"></path>
+                  <path d="M9 3.236v15"></path>
+                </svg>
+              </div>
+              <span class="text-sm font-mono uppercase tracking-widest text-blue-400">
+                Category 02
+              </span>
+            </div>
+            <h2 class="text-5xl md:text-6xl font-display font-bold mb-6 text-white">
+              Nouns Name Places
+            </h2>
+            <p class="text-xl mb-10 text-indigo-300 font-light">
+              Nouns can also be used to name places.
+            </p>
+
+            <div class="space-y-4">
+              <div class="glass-panel p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="text-xl text-white font-mono">library, garden, bathroom</span>
+              </div>
+              <div class="glass-panel p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="text-xl text-white font-mono">lounge, market</span>
+              </div>
+              <div class="glass-panel p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 transition-colors">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="text-xl text-white font-mono">shop, coast, town</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 7: Nouns Name Things & Animals -->
+      <!-- Slide 7: Nouns Name Things & Animals -->
+      <section class="slide">
+        <div class="slide-content flex flex-col items-center justify-center h-full max-w-6xl gap-8">
+
+          <!-- Top: Image & Title Group -->
+          <div class="flex flex-col md:flex-row items-center gap-12 w-full">
+            <!-- Mute Button -->
+            <button id="mute-btn"
+              class="fixed top-4 right-4 bg-gray-800/60 text-white rounded-full p-2 hover:bg-gray-700 transition"
+              onclick="SoundFX.toggleMute(); this.innerText = SoundFX.muted ? '🔈' : '🔊';">
+              🔊
+            </button>
+            <!-- Image -->
+            <div class="relative group w-full md:w-1/2 flex justify-center order-2 md:order-1">
+              <div class="absolute inset-0 bg-pink-500 blur-[80px] opacity-20"></div>
+              <div
+                class="glass-panel p-2 rounded-[2rem] rotate-2 transition-transform duration-500 group-hover:rotate-0 w-full max-w-[28rem]">
+                <img
+                  src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/thing-nouns.jpeg"
+                  class="w-full h-[20rem] object-cover rounded-[1.5rem]" alt="Things Nouns">
+              </div>
+            </div>
+
+            <!-- Text Content -->
+            <div class="w-full md:w-1/2 order-1 md:order-2">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    data-lucide="paw-print" class="lucide lucide-paw-print w-6 h-6 text-pink-400">
+                    <circle cx="11" cy="4" r="2"></circle>
+                    <circle cx="18" cy="8" r="2"></circle>
+                    <circle cx="20" cy="16" r="2"></circle>
+                    <path
+                      d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z">
+                    </path>
+                  </svg>
+                </div>
+                <span class="text-sm font-mono uppercase tracking-widest text-pink-400">
+                  Category 03
+                </span>
+              </div>
+              <h2 class="text-5xl md:text-6xl font-display font-bold mb-4 text-white">
+                Things &amp; Animals
+              </h2>
+              <p class="text-xl mb-6 text-indigo-300 font-light">
+                Nouns name things and animals.
+              </p>
+
+              <div class="glass-panel p-6 rounded-2xl border-l-4 border-pink-400">
+                <p class="text-lg leading-relaxed text-pink-200 font-mono">
+                  <span class="text-white font-bold">Examples:</span> bat, sandwich, tablet, bus, mouse, fox, eagle,
+                  parrot.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom: Interactive Game -->
+          <div class="w-full mt-4">
+            <p class="text-2xl text-indigo-200 font-light text-center mb-6">
+              Look at the words below. Can you find and click on the nouns?
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 w-full" id="spot-noun-grid">
+              <!-- JS Injected -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 9: Detecting Nouns in Sentences -->
+      <!-- Slide 9: Detecting Nouns in Sentences -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-7xl h-full">
+          <div class="order-1 lg:order-1 relative group flex justify-center items-center">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-20"></div>
+            <!-- Redesign: Image without glass container for clean look -->
+            <img
+              src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-detective-1.jpeg"
+              class="w-full max-w-[25rem] aspect-square object-cover rounded-[3rem] shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-transform duration-500 relative z-10"
+              alt="Norah Detective">
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <h2 class="text-4xl lg:text-5xl font-display font-bold mb-6 text-white leading-tight">
+              Can you help Norah <span class="text-brand-400">spot the nouns?</span>
+            </h2>
+
+            <div class="glass-panel p-6 rounded-3xl bg-black/40 border border-white/5 shadow-xl backdrop-blur-xl">
+              <div id="slide-9-sentences" class="space-y-3 font-mono text-lg lg:text-xl text-white leading-relaxed">
+                <!-- JS Injected -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 10: Common Nouns Title -->
+      <!-- Slide 10: Common Nouns Title -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-1 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-indigo-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/icons.jpeg"
+                class="w-full max-w-[30rem] aspect-square object-cover rounded-[2.5rem]"
+                style="clip-path: inset(0 round 2.5rem);">
+            </div>
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <div class="inline-flex items-center gap-3 mb-6">
+              <span class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></span>
+              <span class="font-mono text-sm uppercase tracking-widest text-indigo-400">Part 01</span>
+            </div>
+            <h1 class="font-display text-7xl lg:text-9xl font-bold text-white mb-6 tracking-tighter leading-none">
+              Common<br><span class="text-indigo-400">Nouns</span>
+            </h1>
+            <p class="font-body text-3xl lg:text-4xl text-indigo-200 font-light tracking-wide">
+              General names for everyday things.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 11: What is a Common Noun? -->
+      <!-- Slide 11: What is a Common Noun? -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="relative flex justify-center">
+            <div class="absolute inset-0 bg-brand-500 blur-[100px] opacity-10"></div>
+            <div
+              class="glass-panel p-4 rounded-[2.5rem] relative z-10 border border-white/10 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-notice-board.jpeg"
+                class="w-full h-auto object-cover rounded-[2rem]" alt="Foxes">
+            </div>
+          </div>
+          <div>
+            <h2 class="text-5xl md:text-6xl font-display font-bold mb-8 text-white">
+              What is a <span class="text-brand-400">Common Noun?</span>
+            </h2>
+            <p class="text-2xl leading-relaxed mb-10 text-indigo-200 font-light">
+              Common Nouns are the regular names for regular things. They are
+              the general names for people, places, things, or animals.
+            </p>
+            <div class="glass-panel p-8 rounded-2xl border-l-8 border-brand-500 bg-brand-500/5">
+              <p class="text-xl italic text-white leading-relaxed">
+                "Imagine a big room full of foxes—if I say 'fox,' I mean any
+                fox."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 12: Common Noun Examples -->
+      <!-- Slide 12: Common Noun Examples -->
+      <section class="slide">
+        <div class="slide-content max-w-6xl flex flex-col justify-center h-full">
+          <div style="margin-top: -2rem;">
+            <h2 class="text-5xl md:text-7xl font-display font-bold mb-12 text-center text-white">
+              Common Nouns are <span class="text-indigo-400">General Labels</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">girl</span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  Any girl in the world
+                </span>
+              </div>
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">town</span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  Any town in the world
+                </span>
+              </div>
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">
+                  library
+                </span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  Any library in the world
+                </span>
+              </div>
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">
+                  nation
+                </span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  General Place
+                </span>
+              </div>
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">
+                  animated hero
+                </span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  General Character
+                </span>
+              </div>
+              <div
+                class="glass-panel p-10 rounded-3xl hover:-translate-y-2 transition-transform duration-300 border border-white/10 hover:bg-white/5 group">
+                <span
+                  class="text-4xl font-mono font-bold block mb-4 text-white group-hover:text-brand-400 transition-colors">
+                  teacher</span>
+                <span class="text-base text-indigo-400 uppercase tracking-widest font-bold">
+                  Any teacher in the world
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 13: The Common Noun Rule -->
+      <!-- Slide 13: The Common Noun Rule -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div style="margin-top: -2rem;">
+            <h2 class="text-6xl md:text-7xl font-display font-bold mb-8 text-white">
+              The Common Noun Rule
+            </h2>
+            <p class="text-3xl mb-10 text-indigo-200 font-light leading-relaxed">
+              Because these words are regular names, we write them with a
+              <span class="font-bold text-brand-400 bg-brand-500/10 px-3 py-2 rounded-lg">
+                small letter (lowercase)
+              </span>.
+            </p>
+            <div class="glass-panel p-8 rounded-2xl border-l-8 border-indigo-500">
+              <p class="text-2xl text-indigo-300">
+                We do not need to make them stand out.
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-center" style="margin-top: -2rem;">
+            <div
+              class="glass-panel w-[28rem] h-[28rem] rounded-full flex items-center justify-center border-4 border-white/10 shadow-[0_0_80px_rgba(99,102,241,0.3)] animate-pulse">
+              <span class="text-[13rem] font-mono font-bold text-indigo-500 tracking-tighter">abc</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 14: Check: Are these Common Nouns? -->
+      <!-- Slide 14: Check: Are these Common Nouns? -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-1 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/foxes-common-nouns.png"
+                class="w-full max-w-[30rem] aspect-square object-cover rounded-[2.5rem]"
+                style="clip-path: inset(0 round 2.5rem);">
+            </div>
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <h2 class="text-5xl lg:text-6xl font-display font-bold mb-10 text-white leading-tight">
+              Which are <span class="text-brand-400">Common Nouns?</span>
+            </h2>
+
+            <div class="grid grid-cols-2 gap-6 w-full" id="common-check-container">
+              <!-- JS Injected -->
+            </div>
+
+            <div id="common-check-hint"
+              class="mt-10 glass-panel inline-block px-6 py-4 rounded-2xl border border-red-500/30 bg-red-500/10 hidden transition-opacity duration-500">
+              <p class="text-red-300 italic text-lg font-medium">
+                (Hint: Paris and Mrs. Johnson are NOT Common Nouns!)
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 15: Proper Nouns Intro -->
+      <!-- Slide 15: Proper Nouns Intro -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-1 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-blue-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/fox-proper-noun.jpeg"
+                class="w-full max-w-[30rem] aspect-square object-cover rounded-[2.5rem]"
+                style="clip-path: inset(0 round 2.5rem);">
+            </div>
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <div
+              class="inline-flex items-center gap-3 mb-6 px-6 py-3 rounded-full border border-blue-500/20 bg-blue-500/5 backdrop-blur-md">
+              <span class="text-base font-mono uppercase tracking-widest text-blue-400 font-bold">
+                Part 2
+              </span>
+            </div>
+            <h1
+              class="text-7xl lg:text-9xl font-display font-bold text-white drop-shadow-[0_0_40px_rgba(59,130,246,0.4)] tracking-tighter mb-8 leading-none">
+              Proper<br>Nouns
+            </h1>
+            <p class="text-3xl lg:text-4xl mt-6 font-light text-indigo-200 tracking-wide">
+              Special names for <span class="text-white font-medium">specific things</span>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 16: What is a Proper Noun? -->
+      <!-- Slide 16: What is a Proper Noun? -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div style="margin-top: -2rem;">
+            <h2 class="text-6xl md:text-7xl font-display font-bold mb-8 text-white">
+              What is a <span class="text-blue-400">Proper Noun?</span>
+            </h2>
+            <p class="text-3xl leading-relaxed mb-10 text-indigo-200 font-light">
+              Proper Nouns are special names for specific things. They name a
+              specific person, place, or thing.
+            </p>
+            <div class="glass-panel p-8 rounded-2xl border-l-8 border-blue-500 bg-blue-500/5">
+              <p class="text-2xl text-white leading-relaxed">
+                Example: If a fox runs over to you, and his name is
+                <span class="font-bold text-blue-400 bg-blue-500/10 px-2 py-1 rounded-lg">Max</span>,
+                "Max" is a Proper Noun because he is special and specific.
+              </p>
+            </div>
+          </div>
+          <div class="relative flex justify-center">
+            <div class="absolute inset-0 bg-blue-500 blur-[100px] opacity-20"></div>
+            <div
+              class="glass-panel w-[35rem] h-[35rem] p-3 rounded-[3rem] relative z-10 border-2 border-white/20 overflow-hidden shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-meets-fox.jpeg"
+                class="w-full h-full object-cover rounded-[2.5rem]" alt="Max the Fox">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 17: Capital Letter Rule -->
+      <!-- Slide 17: Capital Letter Rule -->
+      <section class="slide">
+        <div class="slide-content text-center flex flex-col justify-center h-full">
+          <div style="margin-top: -3rem;">
+            <div
+              class="w-48 h-48 mx-auto bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full flex items-center justify-center mb-10 border border-yellow-400/30 shadow-[0_0_80px_rgba(234,179,8,0.3)] animate-bounce duration-[3000ms]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                data-lucide="crown" class="lucide lucide-crown w-24 h-24 text-yellow-400 drop-shadow-lg">
+                <path
+                  d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z">
+                </path>
+                <path d="M5 21h14"></path>
+              </svg>
+            </div>
+            <h2 class="text-7xl md:text-8xl font-display font-bold mb-8 text-white drop-shadow-md">
+              The Shiny Crown!
+            </h2>
+            <p class="text-4xl max-w-4xl mx-auto mb-12 text-indigo-200 font-light leading-relaxed">
+              Because Proper Nouns are special, they must always start with a
+              <span class="text-white font-bold border-b-4 border-yellow-400">Capital Letter</span>.
+            </p>
+            <div class="glass-panel inline-block px-12 py-6 rounded-full border border-yellow-400/20 bg-yellow-400/5">
+              <span class="font-mono text-2xl text-yellow-200">
+                Think of the Capital Letter like a crown—special things wear a crown!
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 18: Power Specific People -->
+      <!-- Slide 18: Power Specific People -->
+      <section class="slide">
+        <div class="slide-content max-w-6xl flex flex-col justify-center h-full">
+          <div style="margin-top: -2rem;">
+            <div class="flex items-center gap-4 mb-10 justify-center">
+              <div class="h-px w-20 bg-white/20"></div>
+              <span class="text-base font-mono text-blue-400 uppercase tracking-widest font-bold">
+                Specific People
+              </span>
+              <div class="h-px w-20 bg-white/20"></div>
+            </div>
+            <h2 class="text-6xl md:text-7xl font-display font-bold text-center mb-16 text-white">
+              Proper Nouns specify <span class="text-blue-400">who.</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-6xl mx-auto w-full">
+              <!-- Headers -->
+              <div
+                class="text-center font-mono text-indigo-400 uppercase tracking-widest font-bold text-2xl mb-4 md:mb-0">
+                Common Noun
+              </div>
+              <div
+                class="text-center font-mono text-blue-400 uppercase tracking-widest font-bold text-2xl mb-4 md:mb-0">
+                Proper Noun
+              </div>
+
+              <!-- Row 1 -->
+              <div class="glass-panel p-8 rounded-3xl text-center border border-white/10">
+                <span class="text-4xl text-white font-bold">girl</span>
+              </div>
+              <div
+                class="glass-panel p-8 rounded-3xl border-l-8 border-blue-500 flex items-center justify-center gap-4 hover:translate-x-2 transition-transform duration-300">
+                <span class="text-4xl text-white font-bold">Emily</span>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="glass-panel p-8 rounded-3xl text-center border border-white/10">
+                <span class="text-4xl text-white font-bold">man</span>
+              </div>
+              <div
+                class="glass-panel p-8 rounded-3xl border-l-8 border-blue-500 flex items-center justify-center gap-4 hover:translate-x-2 transition-transform duration-300">
+                <span class="text-4xl text-white font-bold">Mr. Davis</span>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="glass-panel p-8 rounded-3xl text-center border border-white/10">
+                <span class="text-4xl text-white font-bold">author</span>
+              </div>
+              <div
+                class="glass-panel p-8 rounded-3xl border-l-8 border-blue-500 flex items-center justify-center gap-4 hover:translate-x-2 transition-transform duration-300">
+                <span class="text-4xl text-white font-bold">J.K. Rowling</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 19: Power Specific Places -->
+      <!-- Slide 19: Power Specific Places -->
+      <section class="slide">
+        <div class="slide-content max-w-6xl flex flex-col justify-center h-full">
+          <div style="margin-top: -2rem;">
+            <h2 class="text-6xl md:text-7xl font-display font-bold text-center mb-8 text-white">
+              Proper Nouns specify <span class="text-blue-400">where.</span>
+            </h2>
+            <p class="text-center mb-12 text-3xl text-indigo-200 font-light">
+              Your Town. Specific locations.
+            </p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+              <div
+                class="glass-panel aspect-square flex flex-col items-center justify-center rounded-3xl transition-all duration-300 group hover:bg-white/10 hover:-translate-y-2 border border-white/10">
+                <span class="text-7xl mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">🇫🇷</span>
+                <span class="text-3xl font-bold text-white">Paris</span>
+              </div>
+              <div
+                class="glass-panel aspect-square flex flex-col items-center justify-center rounded-3xl transition-all duration-300 group hover:bg-white/10 hover:-translate-y-2 border border-white/10">
+                <span class="text-7xl mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">🇩🇪</span>
+                <span class="text-3xl font-bold text-white">Berlin</span>
+              </div>
+              <div
+                class="glass-panel aspect-square flex flex-col items-center justify-center rounded-3xl transition-all duration-300 group hover:bg-white/10 hover:-translate-y-2 border border-white/10">
+                <span class="text-7xl mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">🇸🇬</span>
+                <span class="text-3xl font-bold text-white">Singapore</span>
+              </div>
+              <div
+                class="glass-panel aspect-square flex flex-col items-center justify-center rounded-3xl transition-all duration-300 group hover:bg-white/10 hover:-translate-y-2 border border-white/10">
+                <span class="text-7xl mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">🇮🇹</span>
+                <span class="text-3xl font-bold text-white">Rome</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-6">
+              <div class="glass-panel px-8 py-4 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono text-xl">Manchester</span>
+              </div>
+              <div class="glass-panel px-8 py-4 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono text-xl">Brazil</span>
+              </div>
+              <div class="glass-panel px-8 py-4 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono text-xl">The Eiffel Tower</span>
+              </div>
+              <div class="glass-panel px-8 py-4 rounded-full border border-white/10 bg-white/5">
+                <span class="text-white font-mono text-xl">Big Ben</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 20: Power Specific Dates -->
+      <!-- Slide 20: Power Specific Dates -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div
+            class="glass-panel p-10 rounded-[2.5rem] relative overflow-hidden border border-white/10 shadow-2xl group hover:border-white/20 transition-colors">
+            <div
+              class="absolute top-0 right-0 p-6 opacity-10 text-[12rem] font-display font-bold text-white leading-none select-none group-hover:opacity-20 transition-opacity">
+              7
+            </div>
+            <h3 class="text-3xl font-bold mb-8 relative z-10 text-white border-b border-white/10 pb-4">
+              Days of the Week
+            </h3>
+            <ul class="space-y-4 relative z-10">
+              <li class="flex items-center gap-4 text-xl text-indigo-200">
+                <span
+                  class="w-8 h-8 rounded-lg bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold border border-brand-500/30">M</span>
+                Monday
+              </li>
+              <li class="flex items-center gap-4 text-xl text-indigo-200">
+                <span
+                  class="w-8 h-8 rounded-lg bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold border border-brand-500/30">T</span>
+                Tuesday
+              </li>
+              <li class="flex items-center gap-4 text-xl text-indigo-200">
+                <span
+                  class="w-8 h-8 rounded-lg bg-brand-500/20 flex items-center justify-center text-brand-400 font-bold border border-brand-500/30">W</span>
+                Wednesday
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-5xl md:text-6xl font-display font-bold mb-8 text-white">
+              Specific <span class="text-brand-400">Dates</span>
+            </h2>
+            <p class="text-2xl text-indigo-200 font-light mb-10 leading-relaxed">
+              Proper Nouns also include Days of the Week and Months of the Year.
+            </p>
+
+            <div class="flex flex-wrap gap-4">
+              <div
+                class="glass-panel px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <span class="text-white font-mono text-lg">February</span>
+              </div>
+              <div
+                class="glass-panel px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <span class="text-white font-mono text-lg">October</span>
+              </div>
+              <div
+                class="glass-panel px-6 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors">
+                <span class="text-white font-mono text-lg">December</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 21: Brands and Events -->
+      <!-- Slide 21: Brands and Events -->
+      <section class="slide">
+        <div class="slide-content text-center flex flex-col justify-center h-full">
+          <h2 class="text-5xl md:text-6xl font-display font-bold mb-16 text-white">
+            Brands and <span class="text-cyan-400">Events</span>
+          </h2>
+          <div class="flex flex-wrap justify-center gap-12 items-center mb-16">
+            <div
+              class="glass-panel px-16 py-10 rounded-3xl border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:scale-105 transition-transform duration-300">
+              <span class="text-4xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-lg">
+                DreamWorks
+              </span>
+            </div>
+            <div
+              class="glass-panel px-16 py-10 rounded-3xl border border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.2)] hover:scale-105 transition-transform duration-300">
+              <span class="text-4xl md:text-5xl font-bold tracking-tighter text-cyan-400 drop-shadow-lg">
+                ValueMart
+              </span>
+            </div>
+          </div>
+          <p class="text-2xl text-indigo-200 font-light max-w-2xl mx-auto leading-relaxed">
+            Specific religious events and company names also get the crown.
+          </p>
+        </div>
+      </section>
+
+      <!-- Slide 22: Common vs Proper Quick Check -->
+      <!-- Slide 22: Common vs Proper Quick Check -->
+      <section class="slide">
+        <div class="slide-content max-w-5xl flex flex-col justify-center h-full">
+          <h2 class="text-5xl md:text-6xl font-display font-bold mb-12 text-center text-white">
+            Quick Check
+          </h2>
+          <div class="glass-panel rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+            <div class="grid grid-cols-2 border-b border-white/10 bg-white/5">
+              <div class="p-6 text-center font-mono text-indigo-400 uppercase tracking-widest font-bold text-xl">
+                Common
+              </div>
+              <div
+                class="p-6 text-center font-mono uppercase tracking-widest pl-4 border-l border-white/10 text-brand-400 font-bold text-xl">
+                Proper
+              </div>
+            </div>
+            <div class="grid grid-cols-2 border-b border-white/5 hover:bg-white/5 transition-colors group">
+              <div class="p-8 text-center text-2xl text-indigo-200 group-hover:text-white transition-colors">
+                nurse</div>
+              <div class="p-8 text-center pl-4 border-l border-white/5 text-white font-bold text-2xl">
+                Mrs. Johnson
+              </div>
+            </div>
+            <div class="grid grid-cols-2 border-b border-white/5 hover:bg-white/5 transition-colors group">
+              <div class="p-8 text-center text-2xl text-indigo-200 group-hover:text-white transition-colors">
+                mouse</div>
+              <div class="p-8 text-center pl-4 border-l border-white/5 text-white font-bold text-2xl">
+                Whiskers
+              </div>
+            </div>
+            <div class="grid grid-cols-2 border-b border-white/5 hover:bg-white/5 transition-colors group">
+              <div class="p-8 text-center text-2xl text-indigo-200 group-hover:text-white transition-colors">
+                nation
+              </div>
+              <div class="p-8 text-center pl-4 border-l border-white/5 text-white font-bold text-2xl">Japan
+              </div>
+            </div>
+            <div class="grid grid-cols-2 hover:bg-white/5 transition-colors group">
+              <div class="p-8 text-center text-2xl text-indigo-200 group-hover:text-white transition-colors"
+                id="qc-city">
+                city</div>
+              <div class="p-8 text-center pl-4 border-l border-white/5 text-white font-bold text-2xl" id="qc-paris">
+                Paris / Dublin
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <script>
+        // Inline script for Slide 20 interactivity (Quick Check)
+        // We attach this logic here or in the main script.
+        // For cleanliness, we will add the logic in the main script block below,
+        // but we need to ensure these elements have IDs or are selectable.
+        // I added IDs to the last row as an example, but let's use a class-based approach in the main script.
+        // Actually, let's just add the IDs to all of them now for safety.
+      </script>
+
+      <!-- Slide 23: The Golden Rule -->
+      <!-- Slide 23: The Golden Rule -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <!-- Left Column: Image -->
+          <div class="order-1 lg:order-1 flex justify-center relative">
+            <div class="absolute inset-0 bg-yellow-500 blur-[90px] opacity-20"></div>
+            <div
+              class="glass-panel w-[35rem] aspect-video p-3 rounded-[2.5rem] relative z-10 border-yellow-500/30 shadow-2xl flex items-center justify-center -rotate-2 hover:rotate-0 transition-transform duration-500">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-erasing-whiteboard.jpeg"
+                class="w-full h-full object-cover rounded-[2rem]">
+            </div>
+          </div>
+
+          <!-- Right Column: Content -->
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <!-- Header -->
+            <div class="mb-8 text-left">
+              <div
+                class="inline-flex items-center gap-3 mb-4 px-6 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="lucide lucide-crown text-yellow-400">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+                </svg>
+                <span class="text-yellow-400 font-mono uppercase tracking-widest font-bold text-sm">Important</span>
+              </div>
+              <h2 class="text-5xl lg:text-6xl font-display font-bold text-white tracking-tight">
+                The <span class="text-yellow-400">Golden Rule</span>
+              </h2>
+            </div>
+
+            <!-- Main Comparison Card -->
+            <div class="w-full glass-panel rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
+              <div class="grid grid-cols-1">
+                <!-- Wrong Side -->
+                <div
+                  class="p-8 flex flex-row items-center justify-between bg-red-500/5 border-b border-white/5 relative overflow-hidden group">
+                  <div class="flex flex-col">
+                    <span class="text-red-400 font-mono uppercase tracking-widest mb-2 text-xs">Incorrect</span>
+                    <h3
+                      class="text-2xl lg:text-3xl text-red-200/50 line-through decoration-2 decoration-red-500/50 font-display">
+                      "i live in paris"
+                    </h3>
+                  </div>
+                  <div class="p-2 bg-red-500/20 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-x text-red-500">
+                      <path d="M18 6 6 18" />
+                      <path d="m6 6 12 12" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Right Side -->
+                <div
+                  class="p-8 flex flex-row items-center justify-between bg-brand-500/5 relative overflow-hidden group">
+                  <div class="flex flex-col">
+                    <span class="text-brand-400 font-mono uppercase tracking-widest mb-2 text-xs">Correct</span>
+                    <h3 class="text-3xl lg:text-4xl text-white font-bold font-display drop-shadow-lg">
+                      "I live in Paris."
+                    </h3>
+                  </div>
+                  <div class="p-2 bg-brand-500/20 rounded-full shadow-[0_0_20px_rgba(45,212,191,0.4)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                      class="lucide lucide-check text-brand-400">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Explanation Footer -->
+              <div class="p-6 bg-white/5 border-t border-white/10 text-center">
+                <p class="text-xl text-indigo-200 font-light">
+                  Special names always need a <span class="text-yellow-400 font-bold">Capital Letter</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 24: Mr Muddle Intro (Detective Game) -->
+      <!-- Slide 24: Mr Muddle Intro (Detective Game) -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl">
+          <div class="order-1 lg:order-1 relative group">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-20"></div>
+            <div
+              class="glass-panel p-3 rounded-[3rem] relative z-10 border-2 border-white/20 shadow-2xl flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-detective-2.jpeg"
+                class="w-full max-w-[40rem] aspect-square object-cover rounded-[2.5rem] object-top"
+                style="clip-path: inset(0 round 2.5rem);">
+            </div>
+          </div>
+
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <h2 class="text-5xl lg:text-6xl font-display font-bold mb-8 text-white leading-tight">
+              The Case of <span class="text-brand-400">Miss Muddle</span>
+            </h2>
+            <p class="text-xl leading-relaxed mb-10 text-indigo-200 font-light">
+              Today, I want you to look at the world like a detective. Can you
+              spot the missing capital letters for the proper nouns in Miss
+              Muddle's letter?
+            </p>
+            <div
+              class="glass-panel p-16 rounded-[3rem] min-h-[350px] relative bg-black/40 border border-white/5 flex flex-col justify-center items-center">
+              <div class="max-w-3xl mx-auto w-full text-center p-4">
+                <div id="detective-sentences" class="space-y-6 font-mono text-2xl leading-loose text-white p-4">
+                  <!-- JS Injected -->
+                </div>
+                <button id="next-sentence-btn"
+                  class="mt-8 px-8 py-4 rounded-full bg-brand-500 text-black font-bold hover:bg-brand-400 hover:scale-105 transition-all inline-flex items-center gap-3 text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(45,212,191,0.3)]">
+                  Next Sentence <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-arrow-right">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 25: Mr Muddle Places (Interactive) -->
+      <!-- Slide 25: Mr Muddle Places (Interactive) -->
+      <section class="slide">
+        <div class="slide-content max-w-7xl w-full flex flex-col justify-center h-full">
+          <div class="flex items-center gap-6 mb-12">
+            <div
+              class="p-4 bg-cyan-500/10 rounded-2xl border border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.15)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-map-pin text-cyan-400">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <h3 class="text-4xl font-display text-cyan-400 uppercase tracking-widest font-bold drop-shadow-lg">
+              Evidence A: Locations
+            </h3>
+          </div>
+
+          <div
+            class="glass-panel p-16 rounded-[3rem] font-mono text-4xl lg:text-5xl leading-loose text-indigo-200 relative border border-white/10 shadow-2xl bg-black/40 min-h-[400px] flex items-center justify-center">
+            <div id="muddle-evidence-a" class="w-full"></div>
+          </div>
+
+          <div class="mt-12 flex justify-end">
+            <span
+              class="px-8 py-4 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center gap-4 text-lg font-bold uppercase tracking-widest animate-pulse shadow-[0_0_20px_rgba(45,212,191,0.2)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-mouse-pointer-click">
+                <path d="m14 4.1 2.5 2.5" />
+                <path d="m20 9 2.5 2.5" />
+                <path d="M22 22H2v-4l6.8-6.8 6.1 6.1 7.1-7.1V22Z" />
+              </svg>
+              Click the lowercase names to fix them!
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 26: Mr Muddle People & Dates (Interactive) -->
+      <!-- Slide 26: Mr Muddle People & Dates (Interactive) -->
+      <section class="slide">
+        <div class="slide-content max-w-7xl w-full flex flex-col justify-center h-full">
+          <div class="flex items-center gap-6 mb-12">
+            <div
+              class="p-4 bg-pink-500/10 rounded-2xl border border-pink-500/20 shadow-[0_0_30px_rgba(236,72,153,0.15)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-users text-pink-400">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3 class="text-4xl font-display text-pink-400 uppercase tracking-widest font-bold drop-shadow-lg">
+              Evidence B: People &amp; Dates
+            </h3>
+          </div>
+          <div
+            class="glass-panel p-16 rounded-[3rem] font-mono text-4xl lg:text-5xl leading-loose text-indigo-200 relative border border-white/10 shadow-2xl bg-black/40 min-h-[400px] flex items-center justify-center">
+            <div id="muddle-evidence-b" class="w-full"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 27: Quiz - People and 'I' -->
+      <!-- Slide 27: Quiz - People and 'I' -->
+      <section class="slide">
+        <div class="slide-content max-w-5xl flex flex-col justify-center h-full">
+          <div class="text-center mb-10">
+            <span
+              class="inline-block px-4 py-2 rounded-full bg-brand-500/10 text-brand-400 text-xs font-mono uppercase tracking-widest mb-4 border border-brand-500/20">
+              Quiz Section 1
+            </span>
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+              People and 'I': Which needs a capital?
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6" id="quiz-1-container">
+            <!-- JS Injected -->
+          </div>
+          <div id="quiz-1-hint"
+            class="mt-10 glass-panel inline-block px-8 py-4 rounded-full border border-brand-500/30 bg-brand-500/10 cursor-pointer hover:bg-brand-500/20 transition-colors"
+            onclick="this.querySelector('p').classList.remove('opacity-0', 'blur-sm'); this.querySelector('.hint-label').style.display='none'">
+            <span class="hint-label text-brand-400 font-bold uppercase tracking-widest">Click for Hint</span>
+            <p class="text-lg text-indigo-200 italic opacity-0 blur-sm transition-all duration-500">
+              Hint: 'I' is always capitalized when used as a singular pronoun.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 28: Quiz - Places and Streets -->
+      <!-- Slide 28: Quiz - Places and Streets -->
+      <section class="slide">
+        <div class="slide-content max-w-5xl flex flex-col justify-center h-full">
+          <div class="text-center mb-10">
+            <span
+              class="inline-block px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono uppercase tracking-widest mb-4 border border-blue-500/20">
+              Quiz Section 2
+            </span>
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+              Places and Streets
+            </h2>
+            <p class="text-xl text-indigo-300">Which word needs a capital letter?</p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6" id="quiz-2-container">
+            <!-- JS Injected -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 29: Quiz - Specific Dates -->
+      <!-- Slide 29: Quiz - Specific Dates -->
+      <section class="slide">
+        <div class="slide-content max-w-5xl flex flex-col justify-center h-full">
+          <div class="text-center mb-10">
+            <span
+              class="inline-block px-4 py-2 rounded-full bg-pink-500/10 text-pink-400 text-xs font-mono uppercase tracking-widest mb-4 border border-pink-500/20">
+              Quiz Section 3
+            </span>
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+              Specific Days and Dates
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6" id="quiz-3-container">
+            <!-- JS Injected -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 30: Exit Ticket Riddle Match -->
+      <!-- Slide 30: Exit Ticket Riddle Match -->
+      <section class="slide">
+        <div class="slide-content max-w-6xl flex flex-col justify-center h-full">
+          <h2 class="text-5xl md:text-6xl font-display font-bold text-center mb-16 text-white">
+            Exit Ticket <span class="text-brand-400">Riddle Match</span>
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12 h-full items-center">
+            <!-- Questions Column -->
+            <div class="flex flex-col gap-6" id="riddle-questions">
+              <!-- JS Injected -->
+            </div>
+
+            <!-- Answers Column -->
+            <div class="flex flex-col gap-6" id="riddle-answers">
+              <!-- JS Injected -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Slide 31: Mission Complete -->
+      <!-- Slide 31: Mission Complete -->
+      <section class="slide">
+        <div class="slide-content grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-7xl h-full">
+          <!-- Left Column: Big Image -->
+          <div class="order-1 flex justify-center relative">
+            <div class="absolute inset-0 bg-brand-500 blur-[80px] opacity-30"></div>
+            <div
+              class="glass-panel w-[28rem] h-[28rem] p-3 rounded-full relative z-10 border-brand-500/30 shadow-[0_0_80px_rgba(45,212,191,0.3)] flex items-center justify-center">
+              <img
+                src="https://unclestevenandfriends-pixel.github.io/The-naming-game-noun-presentation-assets/norah-good-bye.jpeg"
+                class="w-full h-full rounded-full object-cover border-4 border-white/20">
+            </div>
+          </div>
+
+          <!-- Right Column: Content -->
+          <div class="order-2 flex flex-col justify-center text-left">
+            <h1 class="text-5xl lg:text-7xl font-display font-bold mb-6 text-white drop-shadow-2xl leading-none">
+              Mission <br><span class="text-brand-400">Complete!</span>
+            </h1>
+
+            <div class="glass-panel p-8 rounded-[2rem] border border-white/10 bg-white/5 mb-8 backdrop-blur-xl">
+              <p class="text-xl leading-relaxed text-indigo-100 font-light mb-4">
+                <span class="text-brand-400 font-bold text-2xl block mb-2 font-display">"Goodbye, friends!"</span>
+                A Noun is a naming word. Common Nouns are general. Proper Nouns wear
+                the Crown.
+              </p>
+              <div class="p-4 bg-brand-500/10 rounded-xl border border-brand-500/20">
+                <span class="text-white font-bold text-lg block mb-1">
+                  Don't just see a "woman," see Aunt Emily.
+                </span>
+                <span class="text-brand-400 font-bold uppercase tracking-widest text-xs block">
+                  ```
+              </div>
+            </div>
+
+            <button onclick="document.getElementById('slider').scrollTo({left:0, behavior:'smooth'})"
+              class="self-start px-10 py-5 bg-gradient-to-r from-brand-500 to-brand-400 text-black font-bold text-lg rounded-full hover:scale-105 hover:shadow-[0_0_60px_rgba(45,212,191,0.6)] transition-all duration-300 shadow-[0_0_30px_rgba(45,212,191,0.3)] uppercase tracking-widest flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-rotate-ccw">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74-2.74L3 12" />
+                <path d="M3 5v7h7" />
+              </svg>
+              Restart Experience
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Music Controls -->
+    <div
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-4 p-3 bg-black/50 rounded-full shadow-lg backdrop-blur-md border border-white/10">
+      <button onclick="toggleMusic()" class="text-white text-2xl p-2 rounded-full hover:bg-white/10 transition-colors">
+        <span id="music-icon">🎵</span>
+      </button>
+      <input type="range" min="0" max="1" step="0.05" value="0.5" id="volume-slider"
+        oninput="setMusicVolume(this.value)"
+        class="w-24 h-2 bg-brand-500 rounded-lg appearance-none cursor-pointer accent-brand-400">
+    </div>
+
+    <!-- SECURITY UI LAYERS -->
+    <section id="piracy-screen"
+      class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center hidden">
+      <div class="text-center p-12 border-4 border-red-600 rounded-[3rem] bg-red-900/20 max-w-2xl mx-4">
+        <h1 class="text-6xl font-black text-red-600 mb-6 uppercase tracking-widest font-display">Security Alert</h1>
+        <p class="text-2xl text-red-400 font-mono mb-4">Unauthorized Access Detected</p>
+        <p class="text-red-500/80 text-lg">This software is unauthorized for offline use or hosting on this domain.</p>
+      </div>
+    </section>
+
+    <section id="expired-screen"
+      class="fixed inset-0 z-[9999] bg-zinc-900 flex flex-col items-center justify-center hidden">
+      <div class="text-center p-12 border-4 border-yellow-600 rounded-[3rem] bg-yellow-900/20 max-w-2xl mx-4">
+        <h1 class="text-6xl font-black text-yellow-600 mb-6 uppercase tracking-widest font-display">Assignment Expired
+        </h1>
+        <p class="text-2xl text-yellow-400 font-mono">Please contact Teacher Steven.</p>
+      </div>
+    </section>
+
+    <section id="teacher-lock-screen"
+      class="fixed inset-0 z-[9999] bg-[#0B0C15] flex flex-col items-center justify-center hidden">
+      <div
+        class="glass-panel p-12 rounded-[3rem] border border-white/10 shadow-2xl text-center max-w-md w-full mx-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-brand-500/5"></div>
+        <div class="relative z-10">
+          <div
+            class="mb-8 p-6 bg-brand-500/10 rounded-full inline-block border border-brand-500/20 shadow-[0_0_30px_rgba(45,212,191,0.2)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-lock text-brand-400">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+          </div>
+          <h2 class="text-3xl font-bold text-white mb-2 font-display">Teacher Access Only</h2>
+          <p class="text-indigo-200 mb-8 font-light">Enter PIN to unlock the system</p>
+
+          <input type="password" id="teacher-pin-input" placeholder="Enter PIN"
+            class="w-full bg-black/30 border border-white/10 rounded-xl px-6 py-4 text-center text-white text-xl tracking-[0.5em] mb-6 focus:outline-none focus:border-brand-500/50 transition-all placeholder:tracking-normal placeholder:text-base placeholder:text-white/20">
+
+          <button onclick="unlockSystem()"
+            class="w-full bg-gradient-to-r from-brand-500 to-brand-400 text-black font-bold text-lg py-4 rounded-xl hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(45,212,191,0.4)] transition-all uppercase tracking-widest">
+            Unlock System
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      lucide.createIcons();
+
+      // --- UNIVERSAL SECURITY PROTOCOL (The "Gatekeeper") ---
+      const SECURITY_CONFIG = {
+        ALLOWED_HOST: "your-username.github.io", // Replace with actual username
+        TEACHER_PIN: "zildjian",
+        IS_LOCALHOST: ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:'
+      };
+
+      // --- GLOBAL STATE MANAGEMENT ---
+      let classData = {
+        studentName: "",
+        classDate: "",
+        totalScore: 0,
+        totalQuestions: 0,
+        answersLog: []
+      };
+
+      // --- JUKEBOX ENGINE (v7.1) ---
+      const BACKGROUND_MUSIC = [
+        'assets/music/Song 1.mp3',
+        'assets/music/Song 2.mp3',
+        'assets/music/Song 3.mp3',
+        'assets/music/Song 4.mp3'
+      ];
+      let musicIndex = 0;
+      let musicPlayer = new Audio();
+      let isMusicPlaying = false;
+
+      function initJukebox() {
+        if (isMusicPlaying) return;
+        isMusicPlaying = true;
+
+        // Initial Volume
+        const vol = document.getElementById('volume-slider').value;
+        musicPlayer.volume = vol;
+
+        playNextTrack();
+      }
+
+      function playNextTrack() {
+        if (musicIndex >= BACKGROUND_MUSIC.length) musicIndex = 0;
+
+        musicPlayer.src = BACKGROUND_MUSIC[musicIndex];
+        musicPlayer.preload = "auto"; // Slick Preloading
+
+        musicPlayer.play().catch(e => console.log("Autoplay blocked until interaction"));
+
+        // Gapless Loop Logic
+        musicPlayer.onended = () => {
+          musicIndex++;
+          playNextTrack();
+        };
+      }
+
+      function toggleMusic() {
+        if (musicPlayer.paused) {
+          musicPlayer.play();
+          document.getElementById('music-icon').innerText = '🎵';
+          document.getElementById('music-icon').style.opacity = '1';
+        } else {
+          musicPlayer.pause();
+          document.getElementById('music-icon').innerText = '🔇';
+          document.getElementById('music-icon').style.opacity = '0.5';
+        }
+      }
+
+      function setMusicVolume(val) {
+        musicPlayer.volume = val;
+      }
+
+      // --- ROUTER REFACTOR ---
+      function launchApp(mode, params) {
+        if (mode === 'report') {
+          // REPORT MODE
+          console.log("Entering Report Mode...");
+          initReportMode(params);
+        } else {
+          // CLASS MODE
+          console.log("Entering Class Mode...");
+          initClassMode();
+        }
+      }
+
+      // --- SECURITY ROUTER ---
+      window.addEventListener('load', () => {
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode');
+
+        // CHECK 1: DOMAIN LOCK (Anti-Piracy)
+        if (!SECURITY_CONFIG.IS_LOCALHOST && window.location.hostname !== SECURITY_CONFIG.ALLOWED_HOST) {
+          // Nuke the UI
+          const viewport = document.getElementById('viewport-frame');
+          if (viewport) viewport.remove();
+          const lobby = document.getElementById('lobby-screen');
+          if (lobby) lobby.remove();
+
+          // Show Piracy Screen
+          const piracy = document.getElementById('piracy-screen');
+          piracy.classList.remove('hidden');
+          piracy.style.display = 'flex';
+          return; // STOP EXECUTION
+        }
+
+        // CHECK 2: REPORT MODE (Allow)
+        if (mode === 'report') {
+          launchApp('report', params);
+          return;
+        }
+
+        // CHECK 3: HOMEWORK MODE (Time Bomb)
+        if (mode === 'homework') {
+          const expiry = params.get('expiry');
+          if (expiry) {
+            // Parse YYYY-MM-DD
+            const expiryDate = new Date(expiry).getTime();
+            // Allow the expiry day itself (approx 24h buffer from UTC midnight)
+            const now = Date.now();
+            if (now > expiryDate + 86400000) {
+              const expired = document.getElementById('expired-screen');
+              expired.classList.remove('hidden');
+              expired.style.display = 'flex';
+              return; // STOP
+            }
+          }
+          launchApp('class');
+          return;
+        }
+
+        // CHECK 4: TEACHER MODE (Root)
+        // If no params exist, we assume Teacher/Classroom usage which requires Auth
+        const isAuth = localStorage.getItem('teacher_auth') === 'true';
+
+        if (isAuth) {
+          launchApp('class');
+        } else {
+          // Hide Lobby, Show Lock Screen
+          document.getElementById('lobby-screen').style.display = 'none';
+          const lockScreen = document.getElementById('teacher-lock-screen');
+          lockScreen.classList.remove('hidden');
+          lockScreen.style.display = 'flex';
+        }
+      });
+
+      function unlockSystem() {
+        const input = document.getElementById('teacher-pin-input');
+        if (input.value === SECURITY_CONFIG.TEACHER_PIN) {
+          localStorage.setItem('teacher_auth', 'true');
+          document.getElementById('teacher-lock-screen').style.display = 'none';
+          document.getElementById('lobby-screen').style.display = 'flex'; // Restore Lobby
+          launchApp('class');
+        } else {
+          // Shake animation
+          input.classList.add('border-red-500', 'text-red-500');
+          setTimeout(() => input.classList.remove('border-red-500', 'text-red-500'), 500);
+          input.value = '';
+          input.placeholder = 'WRONG PIN';
+        }
+      }
+
+      function generateHomeworkLink() {
+        const dateInput = document.getElementById('homework-expiry');
+        let date = dateInput.value;
+        let expiryDate;
+
+        if (!date) {
+          // Smart Default: 10 Days from now
+          const tenDaysFromNow = new Date();
+          tenDaysFromNow.setDate(tenDaysFromNow.getDate() + 10);
+          expiryDate = tenDaysFromNow.toISOString().split('T')[0];
+          date = expiryDate; // For display/logic
+        } else {
+          expiryDate = date;
+        }
+
+        const params = new URLSearchParams();
+        params.set('mode', 'homework');
+        params.set('expiry', expiryDate);
+
+        const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        navigator.clipboard.writeText(url).then(() => {
+          alert(`Homework Link Copied!\n\nExpires: ${expiryDate}\n\n${url}`);
+        });
+      }
+
+      function initClassMode() {
+        // Check for Saved Data
+        const savedData = localStorage.getItem('nameGame_data');
+
+        if (savedData) {
+          // SHOW RESUME UI
+          const data = JSON.parse(savedData);
+          const lobbyContent = document.querySelector('#lobby-screen .glass-panel .space-y-6');
+
+          // Replace content with Resume Options
+          lobbyContent.innerHTML = `
+          <div class="text-center">
+            <p class="text-brand-400 font-mono text-sm uppercase tracking-widest mb-4">Session Found</p>
+            <h3 class="text-3xl text-white font-bold mb-8">Welcome back, ${data.studentName}!</h3>
+            
+            <button onclick="resumeSession()" 
+              class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-black font-bold text-xl py-5 rounded-xl hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(34,197,94,0.4)] transition-all duration-300 mb-4 uppercase tracking-widest">
+              Resume Session
+            </button>
+            
+            <button onclick="startNewClass()" 
+              class="w-full bg-white/5 border border-white/10 text-white font-bold text-lg py-4 rounded-xl hover:bg-white/10 transition-all duration-300 uppercase tracking-widest">
+              Start New Class
+            </button>
+          </div>
+        `;
+        } else {
+          // SHOW STANDARD UI (Already in HTML, but ensure visible)
+          // No changes needed if HTML is default
+        }
+
+        // Show Lobby, Hide Report
+        document.getElementById('lobby-screen').style.display = 'flex';
+        document.getElementById('slide-zero').classList.add('hidden');
+
+        // Setup Teacher Shortcut
+        document.addEventListener('keydown', (e) => {
+          if (e.shiftKey && e.key === 'T') {
+            const modal = document.getElementById('teacher-modal');
+            if (modal.open) modal.close();
+            else modal.showModal();
+          }
+        });
+
+        function startClass() {
+          const name = document.getElementById('student-name').value;
+          const date = document.getElementById('class-date').value;
+
+          if (!name || !date) {
+            alert("Please enter your name and date!");
+            return;
+          }
+
+          classData.studentName = name;
+          classData.classDate = date;
+
+          // Start Music
+          initJukebox();
+
+          // Hide Lobby
+          document.getElementById('lobby-screen').style.display = 'none';
+          document.getElementById('viewport-frame').classList.remove('opacity-0');
+          document.querySelector('nav').classList.remove('opacity-0');
+        }
+
+        // Auto-Save on Scroll (Debounced)
+        let scrollTimeout;
+        document.getElementById('slider').addEventListener('scroll', () => {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            // Find active slide
+            const slider = document.getElementById('slider');
+            const slideWidth = slider.clientWidth;
+            const index = Math.round(slider.scrollLeft / slideWidth);
+            localStorage.setItem('nameGame_slide', index);
+          }, 500);
+        });
+      }
+
+      function resumeSession() {
+        const savedData = localStorage.getItem('nameGame_data');
+        const savedSlide = localStorage.getItem('nameGame_slide');
+
+        if (savedData) {
+          classData = JSON.parse(savedData);
+          console.log("Resuming Session:", classData);
+
+          // Replay Visuals
+          replayVisuals(classData.answersLog);
+
+          // Animate Lobby Out
+          const lobby = document.getElementById('lobby-screen');
+          gsap.to(lobby, {
+            opacity: 0,
+            duration: 0.8,
+            onComplete: () => {
+              lobby.style.display = 'none';
+              document.getElementById('viewport-frame').classList.remove('opacity-0');
+              document.querySelector('nav').classList.remove('opacity-0');
+
+              // Scroll to Saved Slide
+              if (savedSlide) {
+                const slider = document.getElementById('slider');
+                const slideWidth = slider.clientWidth;
+                slider.scrollLeft = parseInt(savedSlide) * slideWidth;
+              }
+            }
+          });
+        }
+      }
+
+      function startNewClass() {
+        if (confirm("Are you sure? This will delete your previous progress.")) {
+          localStorage.removeItem('nameGame_data');
+          localStorage.removeItem('nameGame_slide');
+          location.reload(); // Reload to reset everything cleanly
+        }
+      }
+
+      function saveProgress() {
+        // Only save if NOT in report mode
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'report') return;
+
+        localStorage.setItem('nameGame_data', JSON.stringify(classData));
+        console.log("Progress Saved");
+      }
+
+      function initReportMode(params) {
+        // Hide Lobby, Show Report
+        document.getElementById('lobby-screen').style.display = 'none';
+        const reportSlide = document.getElementById('slide-zero');
+        reportSlide.classList.remove('hidden');
+
+        // Reveal Viewport immediately
+        const viewport = document.getElementById('viewport-frame');
+        viewport.classList.remove('opacity-0');
+        document.querySelector('nav').classList.remove('opacity-0');
+
+        // Force Scroll to Slide 0
+        // We use a timeout to ensure layout is ready
+        setTimeout(() => {
+          const slider = document.getElementById('slider');
+          slider.scrollLeft = 0; // Reset scroll
+          reportSlide.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }, 100);
+
+        // Populate Data
+        document.getElementById('report-name').innerText = params.get('student') || 'Unknown';
+        document.getElementById('report-date').innerText = params.get('date') || 'Unknown';
+
+        let score = parseInt(params.get('score') || 0);
+        // const total = parseInt(params.get('total') || 0); // Old logic
+        const TOTAL_POSSIBLE_SCORE = 67; // Fixed total based on forensic code audit
+
+        // Clamp Score (Fix for 69/67 legacy data)
+        if (score > TOTAL_POSSIBLE_SCORE) score = TOTAL_POSSIBLE_SCORE;
+
+        document.getElementById('report-score').innerText = `${score}/${TOTAL_POSSIBLE_SCORE}`;
+
+        // Add Replay Button (Fix for Audio Autoplay)
+        const scoreContainer = document.getElementById('report-score').parentElement;
+        // Check if button already exists to prevent duplicates
+        if (!document.getElementById('replay-celebration-btn')) {
+          const replayBtn = document.createElement('button');
+          replayBtn.id = 'replay-celebration-btn';
+          replayBtn.innerHTML = '🔊 Replay Celebration';
+          replayBtn.className = 'mt-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2 px-4 rounded-full transition-all border border-white/20 uppercase tracking-widest';
+          replayBtn.onclick = () => triggerCelebration(score, TOTAL_POSSIBLE_SCORE);
+          scoreContainer.appendChild(replayBtn);
+        }
+
+        // Add Detailed Log Toggle (Debug)
+        if (!document.getElementById('debug-log-btn')) {
+          const debugBtn = document.createElement('button');
+          debugBtn.id = 'debug-log-btn';
+          debugBtn.innerHTML = '📋 View Evidence Log';
+          debugBtn.className = 'mt-2 ml-2 bg-white/5 hover:bg-white/10 text-indigo-300 text-xs font-mono py-2 px-4 rounded-full transition-all border border-white/10';
+          debugBtn.onclick = () => {
+            const logContainer = document.getElementById('report-log-container');
+            logContainer.classList.toggle('hidden');
+          };
+          scoreContainer.appendChild(debugBtn);
+
+          // Create Log Container
+          const logDiv = document.createElement('div');
+          logDiv.id = 'report-log-container';
+          logDiv.className = 'hidden mt-4 text-left bg-black/50 p-4 rounded-xl border border-white/10 max-h-40 overflow-y-auto text-xs font-mono text-zinc-400';
+
+          // Decode Log
+          try {
+            const logStr = params.get('log');
+            if (logStr) {
+              const log = JSON.parse(atob(logStr));
+              logDiv.innerHTML = log.map(l => {
+                const color = l.startsWith('Correct') ? 'text-green-400' : 'text-red-400';
+                return `<div class="${color}">${l}</div>`;
+              }).join('');
+            } else {
+              logDiv.innerHTML = 'No evidence log found.';
+            }
+          } catch (e) {
+            logDiv.innerHTML = 'Error decoding log.';
+          }
+          scoreContainer.parentElement.appendChild(logDiv);
+        }
+
+        // Badge Logic
+        const percentage = TOTAL_POSSIBLE_SCORE > 0 ? (score / TOTAL_POSSIBLE_SCORE) * 100 : 0;
+        const badge = document.getElementById('report-badge-icon');
+
+        // Trigger Smart Celebration (Audio + Visual)
+        // triggerCelebration(percentage); // Moved to revealReport() for interaction fix
+
+        if (percentage >= 100) {
+          badge.innerText = "Rank: Captain 🏆";
+          badge.className = "absolute bottom-0 left-0 w-full bg-yellow-500 text-black font-bold uppercase text-[10px] py-0.5";
+        } else if (percentage >= 80) {
+          badge.innerText = "Rank: Lieutenant 🥈";
+          badge.className = "absolute bottom-0 left-0 w-full bg-slate-300 text-black font-bold uppercase text-[10px] py-0.5";
+        } else {
+          badge.innerText = "Rank: Cadet 🥉";
+          badge.className = "absolute bottom-0 left-0 w-full bg-brand-500/20 text-brand-300 font-bold uppercase text-[10px] py-0.5";
+        }
+
+        // Note Logic
+        const note = params.get('note');
+        if (note) {
+          document.getElementById('teacher-note-display-container').classList.remove('hidden');
+          document.getElementById('teacher-note-text').innerText = `"${note}"`;
+        }
+
+        // Replay Visuals (Evidence)
+        const logData = params.get('log');
+        if (logData) {
+          try {
+            const log = JSON.parse(atob(logData));
+            replayVisuals(log);
+          } catch (e) {
+            console.error("Log encoding failed", e);
+          }
+        }
+
+        // Lock Evidence (Visual Replay)
+        document.body.classList.add('pointer-events-none');
+        // Re-enable scrolling explicitly
+        document.getElementById('slider').style.pointerEvents = 'auto';
+        document.getElementById('slider').style.overflowX = 'auto';
+
+        // Ensure specific containers are visually locked but not clickable
+        const interactiveSelectors = [
+          '#spot-noun-grid button',
+          '#slide-9-sentences span',
+          '#common-check-container button',
+          '#detective-sentences span',
+          '#muddle-evidence-a span',
+          '#muddle-evidence-b span',
+          '#quiz-1-container span',
+          '#quiz-2-container span',
+          '#quiz-3-container span',
+          '.draggable-answer'
+        ];
+
+        interactiveSelectors.forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => {
+            el.style.pointerEvents = 'none';
+            el.style.cursor = 'default';
+          });
+        });
+      }
+
+      function replayVisuals(log) {
+        console.log("Replaying Visuals...", log);
+
+        // Helper to find elements by text content
+        function findEl(selector, text) {
+          // Normalize text for comparison
+          const clean = t => t.replace(/[.,!?;:]/g, '').trim().toLowerCase();
+          const target = clean(text);
+          return Array.from(document.querySelectorAll(selector))
+            .find(el => clean(el.innerText) === target);
+        }
+
+        log.forEach(fullEntry => {
+          if (fullEntry.includes('Found Noun:')) {
+            const word = fullEntry.split('Found Noun: ')[1];
+            const btn = findEl('#spot-noun-grid button', word);
+            if (btn) btn.className = "bg-green-500 text-black h-32 flex items-center justify-center rounded-2xl text-2xl font-bold shadow-[0_0_20px_rgba(34,197,94,0.5)] transform scale-105";
+          }
+          else if (fullEntry.includes('Clicked Non-Noun:')) {
+            const word = fullEntry.split('Clicked Non-Noun: ')[1];
+            const btn = findEl('#spot-noun-grid button', word);
+            if (btn) btn.className = "bg-red-500/20 text-red-400 h-32 flex items-center justify-center rounded-2xl text-2xl border border-red-500/50";
+          }
+          else if (fullEntry.includes('Sentence Noun:')) {
+            const word = fullEntry.split('Sentence Noun: ')[1];
+            const span = findEl('#slide-9-sentences span', word);
+            if (span) span.classList.add('text-green-400', 'font-bold');
+          }
+          else if (fullEntry.includes('Sentence Non-Noun:')) {
+            const word = fullEntry.split('Sentence Non-Noun: ')[1];
+            const span = findEl('#slide-9-sentences span', word);
+            if (span) span.classList.add('text-red-400', 'line-through');
+          }
+          else if (fullEntry.includes('Common Check:')) {
+            const word = fullEntry.split('Common Check: ')[1];
+            const btn = findEl('#common-check-container button', word);
+            if (btn) {
+              btn.classList.remove('bg-white/5', 'text-zinc-300');
+              btn.classList.add('bg-green-500', 'text-black', 'border-transparent', 'font-bold');
+            }
+          }
+          else if (fullEntry.includes('Common Check Wrong:')) {
+            const word = fullEntry.split('Common Check Wrong: ')[1];
+            const btn = findEl('#common-check-container button', word);
+            if (btn) {
+              btn.classList.remove('bg-white/5', 'text-zinc-300');
+              btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/40');
+            }
+          }
+          else if (fullEntry.includes('Detective:')) {
+            const word = fullEntry.split('Detective: ')[1];
+            const span = findEl('#detective-sentences span', word);
+            if (span) span.className = "interactive-word word-correct text-green-400 font-bold";
+          }
+          else if (fullEntry.includes('Detective Wrong:')) {
+            const word = fullEntry.split('Detective Wrong: ')[1];
+            const span = findEl('#detective-sentences span', word);
+            if (span) span.className = "interactive-word word-wrong text-red-400 line-through";
+          }
+          else if (fullEntry.includes('Muddle Fix:')) {
+            // "Muddle Fix: asia -> Asia"
+            const parts = fullEntry.split('Muddle Fix: ')[1].split(' -> ');
+            const wrong = parts[0];
+            const right = parts[1];
+            // Find span with wrong text OR right text (if already replaced? No, page reloaded)
+            // Page reload resets HTML, so we find 'wrong'.
+            const span = findEl('#muddle-evidence-a span, #muddle-evidence-b span', wrong);
+            if (span) {
+              span.innerText = right; // Apply fix
+              span.classList.add('text-green-400', 'font-bold');
+            }
+          }
+          else if (fullEntry.includes('Muddle Wrong:')) {
+            const word = fullEntry.split('Muddle Wrong: ')[1];
+            const span = findEl('#muddle-evidence-a span, #muddle-evidence-b span', word);
+            if (span) span.classList.add('text-red-400', 'line-through');
+          }
+          else if (fullEntry.includes('Quiz Correct:')) {
+            const word = fullEntry.split('Quiz Correct: ')[1];
+            const span = findEl('#quiz-1-container span, #quiz-2-container span, #quiz-3-container span', word);
+            if (span) span.classList.add('text-blue-400', 'font-bold');
+          }
+          else if (fullEntry.includes('Quiz Wrong:')) {
+            const word = fullEntry.split('Quiz Wrong: ')[1];
+            const span = findEl('#quiz-1-container span, #quiz-2-container span, #quiz-3-container span', word);
+            if (span) span.classList.add('text-red-400', 'line-through');
+          }
+          // Riddles are tricky because of drag/drop. We might skip them for "Blank Evidence" fix 
+          // unless we want to reconstruct the DOM.
+          // "Riddle Solved: Answer"
+          else if (fullEntry.includes('Riddle Solved:')) {
+            const answer = fullEntry.split('Riddle Solved: ')[1];
+            // We can't easily find the drop zone without ID mapping.
+            // But we can find the zone that has this answer? No, the zone has the Question.
+            // Let's skip riddles for now to avoid breaking things, as per "Stabilize" request.
+          }
+        });
+      }
+
+      function generateMagicLink() {
+        const note = document.getElementById('teacher-note-input').value;
+
+        const params = new URLSearchParams();
+        params.set('mode', 'report');
+        params.set('student', classData.studentName);
+        params.set('date', classData.classDate);
+        params.set('score', classData.totalScore);
+        params.set('total', classData.totalQuestions);
+        if (note) params.set('note', note);
+
+        // Encode Log
+        try {
+          const logStr = btoa(JSON.stringify(classData.answersLog));
+          // Limit length to avoid browser issues (approx 2000 chars is safe-ish)
+          if (logStr.length < 5000) {
+            params.set('log', logStr);
+          } else {
+            console.warn("Log too large for URL, skipping evidence replay.");
+          }
+        } catch (e) {
+          console.error("Log encoding failed", e);
+        }
+
+        const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
+        navigator.clipboard.writeText(newUrl).then(() => {
+          const feedback = document.getElementById('copy-feedback');
+          feedback.classList.remove('opacity-0');
+          setTimeout(() => feedback.classList.add('opacity-0'), 3000);
+        });
+      }
+
+      // --- REPORT INTERACTION ---
+      function revealReport() {
+        const overlay = document.getElementById('report-overlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          // Trigger Celebration NOW (after user interaction)
+          const params = new URLSearchParams(window.location.search);
+          const score = parseInt(params.get('score') || 0);
+          const TOTAL_POSSIBLE_SCORE = 67;
+          triggerCelebration(score, TOTAL_POSSIBLE_SCORE);
+        }, 500);
+      }
+
+      // --- SMART CELEBRATION SYSTEM ---
+      function triggerCelebration(score, total) {
+        // Safety check to prevent errors
+        if (typeof confetti === 'undefined') {
+          console.error("Confetti library not loaded!");
+          return;
+        }
+
+        // Clamp Score (Fix for >100%)
+        if (score > total) score = total;
+
+        const percentage = (total > 0) ? Math.round((score / total) * 100) : 0;
+        console.log("🎯 CELEBRATION DEBUG: Score=" + score + ", Total=" + total + ", Percentage=" + percentage + "%");
+
+        // Play Sound
+        let soundTier = 'fail';
+        if (percentage >= 100) soundTier = 'fanfare';
+        else if (percentage >= 80) soundTier = 'cheer';
+        else if (percentage >= 60) soundTier = 'chime';
+        else if (percentage >= 30) soundTier = 'pop';
+
+        console.log("🔊 Playing sound tier: " + soundTier);
+        playTierSound(soundTier);
+
+        // Visuals (The 5 Tiers)
+        // Visuals (The 5 Tiers) - BOOSTED
+        if (percentage < 30) {
+          // Tier 1: Rain (Blue/Grey)
+          confetti({
+            particleCount: 100,
+            spread: 120,
+            origin: { y: 0 },
+            shapes: ['emoji'],
+            shapeOptions: { emoji: { value: ['💧', '🌧️'] } },
+            gravity: 1.5,
+            scalar: 2.5,
+            colors: ['#808080', '#0000FF']
+          });
+        } else if (percentage < 60) {
+          // Tier 2: Balloons/Leaves (Float Up)
+          confetti({
+            particleCount: 80,
+            spread: 100,
+            origin: { y: 0.8 },
+            shapes: ['emoji'],
+            shapeOptions: { emoji: { value: ['🎈', '🍃'] } },
+            gravity: -0.8, // Float up faster
+            scalar: 4.0 // Much bigger
+          });
+        } else if (percentage < 80) {
+          // Tier 3: Stars (Gold/Yellow)
+          confetti({
+            particleCount: 60,
+            spread: 360,
+            shapes: ['emoji'],
+            shapeOptions: { emoji: { value: ['⭐', '✨'] } },
+            origin: { y: 0.5 },
+            scalar: 3.5 // Big stars
+          });
+          // Add standard stars too
+          confetti({ particleCount: 150, spread: 360, shapes: ['star'], colors: ['#F1C40F', '#F39C12'], scalar: 1.5 });
+        } else if (percentage < 100) {
+          // Tier 4: Party (Standard)
+          confetti({ particleCount: 300, spread: 160, origin: { y: 0.6 }, scalar: 1.5 });
+        } else {
+          // Tier 5: Royal (Gold Dust + Long)
+          const duration = 5 * 1000;
+          const animationEnd = Date.now() + duration;
+          const defaults = { startVelocity: 45, spread: 360, ticks: 100, zIndex: 0 };
+
+          const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+          const interval = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+              return clearInterval(interval);
+            }
+
+            const particleCount = 100 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FFA500'], scalar: 1.5 }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#FFD700', '#FFA500'], scalar: 1.5 }));
+          }, 250);
+
+          // Emoji Burst
+          confetti({
+            particleCount: 100,
+            spread: 360,
+            shapes: ['emoji'],
+            shapeOptions: { emoji: { value: ['👑', '🦁', '🏆'] } },
+            origin: { y: 0.5 },
+            scalar: 5.0 // Massive emojis
+          });
+        }
+      }
+
+      function playTierSound(tier) {
+        const sounds = {
+          'fail': 'https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3',
+          'pop': 'https://www.soundjay.com/button/sounds/button-09.mp3',
+          'chime': 'https://www.soundjay.com/misc/sounds/magic-chime-01.mp3',
+          'cheer': 'https://www.soundjay.com/human/sounds/applause-01.mp3',
+          'fanfare': 'https://raw.githubusercontent.com/kurtextrem/Discord-Soundboard/master/sounds/victory.mp3' // Distinct Victory Fanfare
+        };
+
+
+        const audio = new Audio(sounds[tier]);
+        audio.volume = 1.0; // Max volume as requested
+        console.log("🎵 Attempting to play audio:", sounds[tier]);
+        audio.play()
+          .then(() => console.log("✅ Audio playing successfully"))
+          .catch(e => console.error("❌ Audio play failed:", e));
+      }
+
+      // --- LOBBY SCREEN LOGIC ---
+      function startClass() {
+        const nameInput = document.getElementById('student-name');
+        const dateInput = document.getElementById('class-date');
+        const viewport = document.getElementById('viewport-frame');
+        const nav = document.querySelector('nav');
+        const lobby = document.getElementById('lobby-screen');
+
+        if (!nameInput.value || !dateInput.value) {
+          alert("Please enter both your Name and the Date to start!");
+          return;
+        }
+
+        classData.studentName = nameInput.value;
+        classData.classDate = dateInput.value;
+
+        saveProgress(); // Initial Save
+
+        console.log("Class Started:", classData);
+
+        // Force Scroll to Start (Fix for "Halfway" bug)
+        document.getElementById('slider').scrollLeft = 0;
+
+        // Animate Lobby Out
+        gsap.to(lobby, {
+          opacity: 0,
+          duration: 0.8,
+          onComplete: () => {
+            lobby.style.display = 'none';
+            // Reveal Viewport
+            viewport.classList.remove('opacity-0');
+            nav.classList.remove('opacity-0');
+
+            // Trigger initial slide animation
+            const firstSlide = document.querySelector('.slide.active');
+            if (firstSlide) {
+              const elements = firstSlide.querySelectorAll('h1, h2, p, .glass-panel, img, button, .anim-entry');
+              gsap.fromTo(elements,
+                { opacity: 0, y: 50 },
+                { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "back.out(1.2)" }
+              );
+            }
+          }
+        });
+      }
+
+      // --- GAMEPLAY LOGIC (SCORING) ---
+      function recordAnswer(isCorrect, context) {
+        // Global Duplicate Check (Prevents Score Overflow on Refresh)
+        const logEntry = isCorrect ? `Correct: ${context}` : `Wrong: ${context}`;
+        if (classData.answersLog.includes(logEntry)) {
+          console.log("⚠️ Duplicate answer prevented:", logEntry);
+          return;
+        }
+
+        classData.totalQuestions++;
+        if (isCorrect) {
+          classData.totalScore++;
+          classData.answersLog.push(logEntry);
+        } else {
+          classData.answersLog.push(logEntry);
+        }
+        console.log("Current State:", classData);
+        saveProgress(); // Auto-Save
+      }
+
+      // Slider Logic
+      const slider = document.getElementById('slider');
+      const counter = document.getElementById('slide-counter');
+      const totalSlides = 30;
+
+      function updateCounter() {
+        const scrollPos = slider.scrollLeft;
+        const width = slider.offsetWidth;
+        const current = Math.round(scrollPos / width) + 1;
+        counter.innerText = `${current.toString().padStart(2, '0')} / ${totalSlides}`;
+
+        // Update URL hash without cluttering history stack too much
+        // Use replaceState to avoid creating a million history entries
+        const slideId = `slide-${current - 1}`; // 0-indexed ID matches HTML IDs
+        if (window.location.hash !== `#${slideId}`) {
+          history.replaceState(null, null, `#${slideId}`);
+        }
+      }
+
+      slider.addEventListener('scroll', () => {
+        window.requestAnimationFrame(updateCounter);
+      });
+
+      // Disable browser's default scroll restoration to prevent fighting
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      // Restore slide from URL hash on load
+      function restoreSlideFromHash() {
+        if (window.location.hash) {
+          const targetId = window.location.hash.substring(1); // remove #, e.g., "slide-5"
+          // Extract slide number from ID (slide-0, slide-1, etc.)
+          const match = targetId.match(/slide-(\d+)/);
+          if (match) {
+            const slideNumber = parseInt(match[1], 10);
+            // Calculate scroll position (each slide is 100vw wide)
+            const scrollLeft = slideNumber * window.innerWidth;
+            // Use scrollTo with exact position
+            slider.scrollTo({
+              left: scrollLeft,
+              behavior: 'auto' // instant, not smooth
+            });
+            console.log(`Restored to slide ${slideNumber} at position ${scrollLeft}px`);
+          }
+        }
+      }
+
+      // Try to restore immediately when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', restoreSlideFromHash);
+      } else {
+        restoreSlideFromHash();
+      }
+
+      // Also try on window load as a fallback
+      window.addEventListener('load', restoreSlideFromHash);
+
+      function nextSlide() {
+        slider.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
+        SoundFX._play(SoundFX.playSlide);
+      }
+
+      // Keyboard Navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') {
+          slider.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
+          SoundFX._play(SoundFX.playSlide);
+        } else if (e.key === 'ArrowLeft') {
+          slider.scrollBy({ left: -window.innerWidth, behavior: 'smooth' });
+          SoundFX._play(SoundFX.playSlide);
+        }
+      });
+
+      // Slide 8 Game Logic
+      const nouns = [
+        { word: 'fox', isNoun: true }, { word: 'small', isNoun: false },
+        { word: 'bus', isNoun: true }, { word: 'lovely', isNoun: false },
+        { word: 'jumping', isNoun: false }, { word: 'flower', isNoun: true },
+        { word: 'eagle', isNoun: true }, { word: 'bright', isNoun: false },
+        { word: 'parrot', isNoun: true }, { word: 'although', isNoun: false }
+      ];
+      const gameGrid = document.getElementById('spot-noun-grid');
+      nouns.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = "glass-panel h-32 flex items-center justify-center text-zinc-400 hover:bg-white/5 transition-all rounded-2xl text-2xl font-medium";
+        btn.innerText = item.word;
+        btn.onclick = () => {
+          if (btn.dataset.clicked) return; // Spam Prevention
+          btn.dataset.clicked = "true";
+
+          if (item.isNoun) {
+            btn.className = "bg-green-500 text-black h-32 flex items-center justify-center rounded-2xl text-2xl font-bold shadow-[0_0_20px_rgba(34,197,94,0.5)] transition-all transform scale-105";
+            SoundFX._play(SoundFX.playCorrect);
+            recordAnswer(true, `Found Noun: ${item.word}`);
+          } else {
+            btn.className = "bg-red-500/20 text-red-400 h-32 flex items-center justify-center rounded-2xl text-2xl border border-red-500/50 transition-all";
+            gsap.to(btn, { x: 5, duration: 0.05, yoyo: true, repeat: 3 });
+            SoundFX._play(SoundFX.playIncorrect);
+            recordAnswer(false, `Clicked Non-Noun: ${item.word}`);
+          }
+        };
+        gameGrid.appendChild(btn);
+      });
+
+      // Slide 9 Logic (Interactive Sentences)
+      const slide9Sentences = [
+        { text: "The fox is tired.", nouns: ["fox"] },
+        { text: "My shoes are red.", nouns: ["shoes"] },
+        { text: "Norah sat on the carpet.", nouns: ["Norah", "carpet"] },
+        { text: "The youngster looked at the beautiful eagle.", nouns: ["youngster", "eagle"] }
+      ];
+      const slide9Container = document.getElementById('slide-9-sentences');
+      slide9Sentences.forEach((item, index) => {
+        const box = document.createElement('div');
+        box.className = "question-box bg-white/5 border-white/10 transition-colors cursor-default";
+
+        // Prefix number
+        const num = document.createElement('span');
+        num.className = "text-brand-400 font-bold mr-4";
+        num.innerText = (index + 1) + ".";
+        box.appendChild(num);
+
+        const p = document.createElement('p');
+        p.className = "text-white text-2xl inline-block";
+
+        item.text.split(' ').forEach(word => {
+          const cleanWord = word.replace(/[.,]/g, '');
+          const span = document.createElement('span');
+          span.innerText = word + " ";
+          span.className = "cursor-pointer hover:text-brand-200 transition-colors rounded px-1";
+          span.onclick = () => {
+            if (span.dataset.clicked) return; // Spam Prevention
+            span.dataset.clicked = "true";
+
+            if (item.nouns.includes(cleanWord)) {
+              span.classList.add('text-green-400', 'font-bold');
+              gsap.from(span, { scale: 1.2, duration: 0.3 });
+              SoundFX._play(SoundFX.playCorrect);
+              recordAnswer(true, `Sentence Noun: ${cleanWord}`);
+            } else {
+              span.classList.add('text-red-400', 'line-through');
+              gsap.to(span, { x: 5, duration: 0.05, yoyo: true, repeat: 3 });
+              SoundFX._play(SoundFX.playIncorrect);
+              recordAnswer(false, `Sentence Non-Noun: ${cleanWord}`);
+            }
+          };
+          p.appendChild(span);
+        });
+        box.appendChild(p);
+        slide9Container.appendChild(box);
+      });
+
+      // Slide 14 Check Logic
+      const checkWords = [
+        { word: 'mouse', isCommon: true }, { word: 'Paris', isCommon: false },
+        { word: 'sandwich', isCommon: true }, { word: 'laptop', isCommon: true },
+        { word: 'nurse', isCommon: true }, { word: 'Mrs. Johnson', isCommon: false }
+      ];
+      const checkContainer = document.getElementById('common-check-container');
+      const checkHint = document.getElementById('common-check-hint');
+      let checkCount = 0;
+
+      checkWords.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = "px-6 py-6 rounded-2xl border border-white/10 bg-white/5 text-2xl font-mono text-zinc-300 hover:bg-white/10 hover:scale-105 transition-all duration-300 w-full";
+        btn.innerText = item.word;
+        btn.onclick = () => {
+          if (btn.classList.contains('clicked')) return;
+          btn.classList.add('clicked');
+          checkCount++;
+
+          if (item.isCommon) {
+            btn.classList.remove('bg-white/5', 'text-zinc-300');
+            btn.classList.add('bg-green-500', 'text-black', 'border-transparent', 'font-bold');
+            SoundFX._play(SoundFX.playCorrect);
+            recordAnswer(true, `Common Check: ${item.word}`);
+          } else {
+            btn.classList.remove('bg-white/5', 'text-zinc-300');
+            btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/40');
+            SoundFX._play(SoundFX.playIncorrect);
+            recordAnswer(false, `Common Check Wrong: ${item.word}`);
+          }
+
+          if (checkCount === checkWords.length) {
+            checkHint.classList.remove('hidden');
+            setTimeout(() => checkHint.classList.remove('opacity-0'), 100);
+          }
+        }
+        checkContainer.appendChild(btn);
+      });
+
+      // --- ANIMATION & SPOTLIGHT LOGIC ---
+
+      // Mouse Glow (Draft 3 Exact)
+      const frame = document.getElementById('viewport-frame');
+      const glow = document.getElementById('mouse-glow');
+
+      if (frame && glow) {
+        frame.addEventListener('mousemove', (e) => {
+          const rect = frame.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          glow.style.left = x + 'px';
+          glow.style.top = y + 'px';
+        });
+      }
+
+      // Intersection Observer for Slide Entry/Exit
+      const observerOptions = {
+        root: null, // Use viewport
+        threshold: 0.3 // Trigger slightly earlier
+      };
+
+      const slideObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+
+            // GSAP "Fly In" Animation for more dynamic feel
+            // We select direct children of slide-content or specific elements
+            const elements = entry.target.querySelectorAll('h1, h2, p, .glass-panel, img, button, .anim-entry');
+
+            if (elements.length > 0) {
+              gsap.fromTo(elements,
+                {
+                  opacity: 0,
+                  y: 50,
+                  x: (i) => i % 2 === 0 ? -30 : 30, // Alternate coming from left/right slightly
+                  scale: 0.9
+                },
+                {
+                  opacity: 1,
+                  y: 0,
+                  x: 0,
+                  scale: 1,
+                  duration: 0.8,
+                  stagger: 0.1,
+                  ease: "back.out(1.2)",
+                  overwrite: true
+                }
+              );
+            }
+
+          } else {
+            entry.target.classList.remove('active');
+            // Optional: Reset state so it animates again? 
+            // Or just let it be. The user said "transition away from it", 
+            // so maybe we animate out?
+            // Animating out might be distracting during scroll, but let's try a subtle fade out
+            /*
+            const elements = entry.target.querySelectorAll('h1, h2, p, .glass-panel, img, button, .anim-entry');
+            gsap.to(elements, { opacity: 0, duration: 0.5 });
+            */
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.slide').forEach(slide => {
+        slideObserver.observe(slide);
+      });
+
+      // --- SOUND EFFECTS UTILITY ---
+      const SoundFX = {
+        ctx: null,
+        unlocked: false,
+        muted: false,
+        init: function () {
+          if (!this.ctx) {
+            try {
+              this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+              console.log('AudioContext created, state:', this.ctx.state);
+            } catch (e) {
+              console.error('Failed to create AudioContext:', e);
+              return;
+            }
+          }
+          return this.ctx;
+        },
+        unlock: function () {
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume().then(() => {
+              console.log('AudioContext resumed, state:', this.ctx.state);
+              this.unlocked = true;
+            });
+          } else {
+            this.unlocked = true;
+          }
+        },
+        // Correct answer sound
+        playCorrect: function () {
+          if (!this.ctx) return;
+          try {
+            this.unlock();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime);
+            osc.stop(this.ctx.currentTime + 0.4);
+          } catch (e) {
+            console.error('Error playing correct sound:', e);
+          }
+        },
+        // Incorrect answer sound
+        playIncorrect: function () {
+          if (!this.ctx) return;
+          try {
+            this.unlock();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.25);
+            gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime);
+            osc.stop(this.ctx.currentTime + 0.25);
+          } catch (e) {
+            console.error('Error playing incorrect sound:', e);
+          }
+        },
+        // Generic click sound for UI interactions
+        playClick: function () {
+          if (!this.ctx) return;
+          try {
+            this.unlock();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime);
+            osc.stop(this.ctx.currentTime + 0.2);
+          } catch (e) {
+            console.error('Error playing click sound:', e);
+          }
+        },
+        // Slide transition whoosh sound
+        playSlide: function () {
+          if (!this.ctx) return;
+          try {
+            this.unlock();
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime);
+            osc.stop(this.ctx.currentTime + 0.2);
+          } catch (e) {
+            console.error('Error playing slide sound:', e);
+          }
+        },
+        // Mute toggle
+        muted: false,
+        toggleMute: function () {
+          this.muted = !this.muted;
+        },
+        // Helper to respect mute
+        _play: function (playFn) {
+          if (this.muted) return;
+          playFn.call(this);
+        }
+      };
+
+      // Initialize audio context on page load
+      SoundFX.init();
+
+      // Set up global unlock on first user interaction
+      const unlockAudio = () => {
+        SoundFX.unlock();
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+      };
+      document.addEventListener('click', unlockAudio);
+      document.addEventListener('touchstart', unlockAudio);
+      document.addEventListener('keydown', unlockAudio);
+
+      // --- DETECTIVE GAME LOGIC (Slide 24) ---
+      const detectiveSentences = [
+        { text: "The cat sat on the mat.", nouns: ["cat", "mat"] },
+        { text: "A dog barked at the postman.", nouns: ["dog", "postman"] },
+        { text: "My sister plays the piano.", nouns: ["sister", "piano"] },
+        { text: "Birds fly in the sky.", nouns: ["Birds", "sky"] },
+        { text: "The teacher wrote on the whiteboard.", nouns: ["teacher", "whiteboard"] }
+      ];
+
+      let sentenceIdx = 0;
+      function initDetective() {
+        const container = document.getElementById('detective-sentences');
+        const btn = document.getElementById('next-sentence-btn');
+
+        if (!container || !btn) return;
+
+        // Track found nouns for current sentence
+        let currentFound = 0;
+
+        // Initial Render
+        renderSentence();
+
+        btn.onclick = () => {
+          sentenceIdx++;
+          currentFound = 0; // Reset for next sentence
+          if (sentenceIdx >= detectiveSentences.length) {
+            btn.innerHTML = 'Good Job! <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>';
+            btn.disabled = true;
+            btn.classList.add('bg-green-500', 'text-black', 'border-transparent');
+            btn.classList.remove('bg-brand-500/10', 'text-brand-400');
+            return;
+          }
+          renderSentence();
+        };
+
+        function renderSentence() {
+          const data = detectiveSentences[sentenceIdx];
+          container.innerHTML = "";
+
+          // Reset Button State
+          btn.disabled = true;
+          btn.innerHTML = 'Find all nouns first...';
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.classList.remove('hover:bg-brand-500/20');
+
+          const p = document.createElement('p');
+          p.className = "text-center";
+          data.text.split(' ').forEach(word => {
+            const clean = word.replace(/[.,]/g, '');
+            const span = document.createElement('span');
+            span.innerText = word + " ";
+            span.className = "interactive-word cursor-pointer hover:text-brand-400 transition-colors";
+            span.onclick = () => {
+              if (span.dataset.clicked) return; // Spam Prevention
+              span.dataset.clicked = "true";
+
+              if (data.nouns.includes(clean)) {
+                SoundFX._play(SoundFX.playCorrect);
+                span.className = "interactive-word word-correct text-green-400 font-bold";
+                gsap.from(span, { scale: 1.2, duration: 0.3, ease: "back.out(1.7)" });
+                recordAnswer(true, `Detective: ${clean}`);
+
+                currentFound++;
+                if (currentFound === data.nouns.length) {
+                  btn.disabled = false;
+                  btn.innerHTML = 'Next Sentence <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+                  btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                  btn.classList.add('hover:bg-brand-500/20');
+                }
+              } else {
+                SoundFX._play(SoundFX.playIncorrect);
+                gsap.to(span, { x: 5, duration: 0.1, yoyo: true, repeat: 3 });
+                span.className = "interactive-word word-wrong text-red-400 line-through";
+                setTimeout(() => span.className = "interactive-word cursor-pointer hover:text-brand-400 transition-colors", 1000);
+                recordAnswer(false, `Detective Wrong: ${clean}`);
+              }
+            };
+            p.appendChild(span);
+          });
+          container.appendChild(p);
+          gsap.from(p, { opacity: 0, y: 20, duration: 0.6 });
+        }
+      }
+
+      // Initialize Detective Game
+      initDetective();
+
+      // --- MR MUDDLE GAME LOGIC (Slide 25 & 26) ---
+      const muddleWords = {
+        "blue avenue": "Blue Avenue", "muddleton": "Muddleton", "asia": "Asia",
+        "france": "France", "greece": "Greece", "turkey": "Turkey",
+        "aegean sea": "Aegean Sea", "big ben": "Big Ben", "mr. davies": "Mr. Davies",
+        "oliver": "Oliver", "sophie": "Sophie", "miss muddle": "Miss Muddle",
+        "london": "London", "friday": "Friday", "february": "February"
+      };
+
+      const muddleSourceA = "I went to blue avenue in muddleton. Later I flew to asia, then france, greece, and turkey. I visited london and saw big ben. I swam in the aegean sea.";
+      const muddleSourceB = "I met mr. davies, oliver, and sophie at school on friday, february 14th.\n\nSigned,\nmiss muddle";
+
+      function initMuddle() {
+        const containerA = document.getElementById('muddle-evidence-a');
+        const containerB = document.getElementById('muddle-evidence-b');
+
+        if (containerA) renderMuddle(containerA, muddleSourceA);
+        if (containerB) renderMuddle(containerB, muddleSourceB);
+
+        function renderMuddle(container, text) {
+          container.innerHTML = "";
+          const p = document.createElement('p');
+          p.className = "leading-relaxed";
+
+          // Split by spaces/newlines but preserve them
+          // We need a robust tokenizer to handle punctuation attached to words
+          // Simple approach: split by space, check for punctuation
+
+          const words = text.split(/(\s+)/); // Split by whitespace, keep delimiters
+
+          words.forEach(word => {
+            if (word.trim().length === 0) {
+              p.appendChild(document.createTextNode(word));
+              return;
+            }
+
+            // Check if this word (or phrase) is part of a muddle target
+            // This is tricky because "blue avenue" is 2 words.
+            // For simplicity in this specific text, we can check single words or known phrases.
+            // However, the previous implementation used regex replace on the whole string.
+            // To support "incorrect click", we need to know if a clicked word is NOT a target.
+
+            // Better approach: Tokenize by word boundary.
+          });
+
+          // Re-implementing with full tokenization for interaction
+          // We will just wrap every word in a span.
+          // If it matches a muddle key (lowercase), it's correctable.
+          // If not, it's an error to click.
+
+          // We need to handle multi-word targets like "blue avenue".
+          // Let's handle them by checking if the current word + next word matches.
+          // Or simpler: Just check individual words against the dictionary?
+          // "blue avenue" -> "Blue Avenue". 
+          // If I click "blue", it turns to "Blue". If I click "avenue", it turns to "Avenue".
+          // This is acceptable.
+
+          // Update dictionary for single words where possible
+          const singleWordMap = {};
+          Object.keys(muddleWords).forEach(k => {
+            const parts = k.split(' ');
+            const correctParts = muddleWords[k].split(' ');
+            parts.forEach((p, i) => {
+              singleWordMap[p] = correctParts[i];
+            });
+          });
+
+          // Special handling for "14th" attached to February? No, "14th" is separate.
+          // "february" is in map.
+
+          text.split(/(\n|\s+)/).forEach(token => {
+            if (!token.trim()) {
+              p.appendChild(document.createTextNode(token));
+              return;
+            }
+
+            const clean = token.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            const span = document.createElement('span');
+            span.innerText = token;
+            span.className = "cursor-pointer hover:text-white transition-colors rounded px-0.5 inline-block";
+
+            span.onclick = () => {
+              if (span.dataset.clicked) return; // Spam Prevention
+              span.dataset.clicked = "true";
+
+              if (singleWordMap[clean]) {
+                // Correct!
+                SoundFX._play(SoundFX.playCorrect);
+                recordAnswer(true, `Muddle Fix: ${clean} -> ${singleWordMap[clean]}`);
+                // Preserve punctuation
+                const punctuation = token.replace(/[a-zA-Z0-9]/g, '');
+                // We need to be careful about where punctuation is (start/end)
+                // Simple hack: replace the word part
+                const correctWord = singleWordMap[clean];
+                // If token was "asia," -> "Asia,"
+                // We can try to reconstruct or just replace text content if we are sure
+
+                // Let's just use the map value and append punctuation if it was at the end
+                const lastChar = token.slice(-1);
+                let newText = correctWord;
+                if (/[.,]/.test(lastChar)) newText += lastChar;
+
+                // Actually, let's just replace the inner text with the mapped value + punctuation
+                // This might be slightly buggy with complex punctuation, but fine for this text.
+
+                // Better: Replace the alphanumeric part
+                const newContent = token.replace(/[a-zA-Z0-9]+/g, correctWord);
+                span.innerText = newContent;
+
+                span.classList.add('text-green-400', 'font-bold');
+                gsap.from(span, { scale: 1.2, color: '#fff', duration: 0.5, ease: "elastic.out(1, 0.3)" });
+              } else {
+                // Incorrect
+                SoundFX.playIncorrect();
+                span.classList.add('text-red-400', 'line-through');
+                gsap.to(span, { x: 5, duration: 0.05, yoyo: true, repeat: 3 });
+                recordAnswer(false, `Muddle Wrong: ${clean}`);
+              }
+            };
+            p.appendChild(span);
+          });
+          container.appendChild(p);
+        }
+      }
+
+      window.fixMuddle = null; // Deprecated
+
+      // Initialize Mr Muddle
+      initMuddle();
+
+      // --- QUIZ LOGIC (Slides 27-29) ---
+      const quizData = {
+        q1: [
+          { text: "we were waiting for ryan to finish library.", nouns: ["ryan"] },
+          { text: "my brother and i have a pet rabbit.", nouns: ["i"] },
+          { text: "i think lucy is very good at painting.", nouns: ["i", "lucy"] }
+        ],
+        q2: [
+          { text: "my best friend lives on hillside road.", nouns: ["hillside", "road"] },
+          { text: "i am going to greece this summer.", nouns: ["greece"] },
+          { text: "last year, i took a holiday to scotland.", nouns: ["scotland"] }
+        ],
+        q3: [
+          { text: "mum and i sometimes play badminton on mondays.", nouns: ["mondays"] },
+          { text: "i am going to holiday this sunday.", nouns: ["sunday"] },
+          { text: "on july 4th, we watched fireworks.", nouns: ["july"] }
+        ]
+      };
+
+      function initQuiz(containerId, questions) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        questions.forEach((q, idx) => {
+          const box = document.createElement('div');
+          box.className = "glass-panel p-8 rounded-2xl border border-white/10 flex items-center gap-6";
+
+          const letter = document.createElement('div');
+          letter.className = "w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white font-bold border border-white/10 shrink-0";
+          letter.innerText = String.fromCharCode(65 + idx);
+          box.appendChild(letter);
+
+          const p = document.createElement('p');
+          p.className = "text-2xl text-indigo-300";
+
+          let foundCount = 0;
+          const totalNouns = q.nouns.length;
+
+          // Split by spaces but keep punctuation attached to words for display, but strip for check
+          // Simpler: split by space, check if word contains noun
+          q.text.split(' ').forEach(word => {
+            const span = document.createElement('span');
+            span.innerText = word + " ";
+
+            // Clean word for check
+            const clean = word.replace(/[^a-zA-Z]/g, ''); // Remove punctuation
+
+            // Only make 'I' non-interactive if it is NOT a target noun (e.g. for Slide 29)
+            // If it IS a target (Slide 27), it must be clickable.
+            if (clean === 'I' && !q.nouns.includes('I')) {
+              span.className = "px-1 rounded cursor-default"; // Not interactive
+            } else {
+              span.className = "cursor-pointer hover:text-white transition-colors px-1 rounded";
+              span.onclick = () => {
+                if (span.classList.contains('text-blue-400') || span.classList.contains('text-red-400')) return;
+                if (span.dataset.clicked) return; // Spam Prevention
+                span.dataset.clicked = "true";
+
+                // Check if this word is one of the target nouns
+                const isTarget = q.nouns.some(n => word.includes(n));
+
+                if (isTarget) {
+                  SoundFX.playCorrect();
+                  span.classList.add('text-blue-400', 'font-bold');
+                  recordAnswer(true, `Quiz Correct: ${clean}`);
+                  foundCount++;
+                  if (foundCount === totalNouns) {
+                    // All found! Show green tick
+                    if (!box.querySelector('.quiz-check')) {
+                      const check = document.createElement('div');
+                      check.className = 'quiz-check ml-auto text-green-400';
+                      check.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+                      box.appendChild(check);
+                      gsap.from(check, { scale: 0, rotation: -180, duration: 0.5 });
+                      box.classList.add('border-green-500/50', 'bg-green-500/10');
+                    }
+                  }
+                } else {
+                  SoundFX.playIncorrect();
+                  span.classList.add('text-red-400', 'line-through');
+                  gsap.to(span, { x: 5, duration: 0.05, yoyo: true, repeat: 3 });
+                  recordAnswer(false, `Quiz Wrong: ${clean}`);
+                }
+              };
+            }
+            p.appendChild(span);
+          });
+          box.appendChild(p);
+          container.appendChild(box);
+        });
+      }
+
+      initQuiz('quiz-1-container', quizData.q1);
+      initQuiz('quiz-2-container', quizData.q2);
+      initQuiz('quiz-3-container', quizData.q3);
+
+      // --- EXIT TICKET RIDDLE MATCH (Slide 30) ---
+      const riddles = [
+        { q: "You can use me to write a story.", a: "Crayon", id: "r1" },
+        { q: "I have four paws, and I can meow.", a: "A cat", id: "r2" },
+        { q: "Which animation company made Shrek?", a: "DreamWorks", id: "r3" }
+      ];
+
+      function initRiddles() {
+        const qContainer = document.getElementById('riddle-questions');
+        const aContainer = document.getElementById('riddle-answers');
+        if (!qContainer || !aContainer) return;
+
+        qContainer.innerHTML = '';
+        aContainer.innerHTML = '';
+
+        // Render Questions (Drop Zones)
+        riddles.forEach((item, idx) => {
+          const zone = document.createElement('div');
+          zone.className = "glass-panel p-6 rounded-2xl text-left border border-white/10 w-full relative min-h-[140px] flex flex-col justify-center transition-colors";
+          zone.dataset.id = item.id;
+          zone.innerHTML = `<span class="text-brand-400 font-bold mr-2 mb-2 block">Riddle ${idx + 1}:</span> <span class="text-white text-xl block">${item.q}</span>`;
+
+          // Drag Events
+          zone.ondragover = (e) => {
+            e.preventDefault(); // Allow drop
+            if (!zone.querySelector('.draggable-answer')) {
+              zone.classList.add('bg-white/10', 'border-brand-500');
+            }
+          };
+          zone.ondragleave = () => {
+            zone.classList.remove('bg-white/10', 'border-brand-500');
+          };
+          zone.ondrop = (e) => {
+            e.preventDefault();
+            zone.classList.remove('bg-white/10', 'border-brand-500');
+
+            // If already filled, ignore
+            if (zone.querySelector('.draggable-answer')) return;
+
+            const dataStr = e.dataTransfer.getData("text/plain");
+            if (!dataStr) return;
+
+            const data = JSON.parse(dataStr);
+
+            if (data.id === item.id) {
+              // Correct Match
+              SoundFX.playCorrect();
+              recordAnswer(true, `Riddle Solved: ${item.a}`);
+              const draggedBtn = document.getElementById(data.elementId);
+              if (draggedBtn) {
+                // Remove button from answer list (leaving empty slot)
+                draggedBtn.remove();
+
+                // Update Zone Content Compactly
+                zone.innerHTML = `
+                <span class="text-brand-400 font-bold mr-2 mb-2 block">Riddle ${idx + 1}:</span>
+                <span class="text-white text-xl block">${item.q}</span>
+                <div class="mt-2 pt-2 border-t border-white/10 text-green-400 font-bold">
+                  Answer: ${item.a} ✅
+                </div>
+              `;
+
+                // Style Zone
+                zone.classList.add('border-green-500/50', 'bg-green-500/10');
+
+                // Animation
+                gsap.from(zone, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
+              }
+            } else {
+              // Incorrect
+              SoundFX.playIncorrect();
+              recordAnswer(false, `Riddle Wrong Drop`);
+              zone.classList.add('bg-red-500/20', 'border-red-500');
+              setTimeout(() => zone.classList.remove('bg-red-500/20', 'border-red-500'), 500);
+            }
+          };
+
+          qContainer.appendChild(zone);
+        });
+
+        // Render Answers (Draggable) - Fixed Order: DreamWorks, Crayon, A Cat
+        // riddles[0] = Crayon, riddles[1] = A Cat, riddles[2] = DreamWorks
+        const fixedOrderIndices = [2, 0, 1];
+        const shuffledAnswers = fixedOrderIndices.map(i => ({ ...riddles[i], elementId: `ans-${i}` }));
+
+        shuffledAnswers.forEach(item => {
+          // Create a slot to hold the button
+          const slot = document.createElement('div');
+          slot.className = "w-full min-h-[100px] flex items-center justify-center"; // Fixed height slot
+
+          const btn = document.createElement('div');
+          btn.id = item.elementId;
+          btn.draggable = true;
+          btn.className = "glass-panel p-6 rounded-2xl text-center hover:bg-white/5 transition-all border border-white/10 w-full text-2xl font-bold text-indigo-300 cursor-grab active:cursor-grabbing";
+          btn.innerText = item.a;
+
+          btn.ondragstart = (e) => {
+            e.dataTransfer.setData("text/plain", JSON.stringify({ id: item.id, elementId: item.elementId }));
+            e.dataTransfer.effectAllowed = "move";
+            setTimeout(() => btn.classList.add('opacity-50'), 0);
+          };
+          btn.ondragend = () => {
+            btn.classList.remove('opacity-50');
+          };
+
+          slot.appendChild(btn);
+          aContainer.appendChild(slot);
+        });
+      }
+
+      initRiddles();
+
+      // --- SLIDE 20 INTERACTIVITY (Quick Check) ---
+      function initQuickCheck() {
+        // Find Slide 20 by content
+        const slide20 = Array.from(document.querySelectorAll('.slide')).find(s => s.innerHTML.includes('Quick Check'));
+        if (!slide20) return;
+
+        // Select the rows (skipping the header row)
+        // The structure is: .glass-panel > .grid (header) ... .grid (row 1) ...
+        const rows = slide20.querySelectorAll('.glass-panel > .grid');
+
+        rows.forEach((row, index) => {
+          if (index === 0) return; // Skip header
+
+          const cols = row.children;
+          if (cols.length < 2) return;
+
+          const commonDiv = cols[0];
+          const properDiv = cols[1];
+
+          // Make Interactive
+          [commonDiv, properDiv].forEach(div => {
+            div.style.cursor = 'pointer';
+            div.onclick = () => {
+              if (div.dataset.clicked) return;
+              div.dataset.clicked = "true";
+
+              // Visual Feedback
+              div.classList.add('bg-green-500/20', 'text-green-400', 'font-bold');
+              gsap.from(div, { scale: 1.1, duration: 0.2 });
+
+              SoundFX.playCorrect();
+              recordAnswer(true, `Quick Check: ${div.innerText.trim()}`);
+            };
+          });
+        });
+      }
+      initQuickCheck();
+    </script>
+</body>
+
+</html>
